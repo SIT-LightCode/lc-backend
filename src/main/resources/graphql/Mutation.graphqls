@@ -1,0 +1,6 @@
+type Mutation {
+    createBook(title: String, pages: Int): Book
+    updateBook(id: Int, title: String, pages: Int): Book
+
+    deleteBook(id: Int): ResponseMessage
+}
