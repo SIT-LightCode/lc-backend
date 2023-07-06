@@ -1,16 +1,13 @@
-name: 'New Commit Notification'
+name: discord-noti
 on: push
 
-jobs:
+jobs: 
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord notification
-        uses: stegzilla/discord-notify@v2
-        with:
-          webhook_url: https://discord.com/api/webhooks/1126527392354140160/3i7l0sEpVBoY6Da7vBfwYIdg8aBHRqaIf55XVyusCM5j4MOAQfBvEd3Pll-L7B11tJIa
-          title: New PR opened
-          message: "**${{ github.event.pull_request.title }}**\n**Creator:** ${{ github.event.pull_request.user.login }}\n${{ github.event.pull_request.html_url }}"
-          include_image: true
-          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-          username: GitHub Push Notifier
+    - name: Run Discord Webhook
+      uses: johnnyhuy/actions-discord-git-webhook@v1.0.0
+      with:
+        webhook_url: ${{ secrets.DISCORD_PUSH_WEBHOOK }}
+        censor_username: false
+        hide_links: false
