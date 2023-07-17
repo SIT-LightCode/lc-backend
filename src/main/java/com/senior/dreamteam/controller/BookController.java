@@ -3,6 +3,7 @@ package com.senior.dreamteam.controller;
 import com.senior.dreamteam.model.Book;
 import com.senior.dreamteam.model.ResponseMessage;
 import com.senior.dreamteam.repository.BookRepository;
+import com.senior.dreamteam.service.BookService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -42,6 +43,8 @@ public class BookController {
 
     @MutationMapping
     public ResponseMessage deleteBook(@Argument("id") Integer id) {
+        BookService bookService = new BookService();
+        bookService.test();
         return bookRepository.deleteBook(id);
     }
 }
