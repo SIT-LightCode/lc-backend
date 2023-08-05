@@ -52,6 +52,11 @@ public class BookRepository {
         }
     }
 
+    public ResponseMessage testAnswer(Integer questionId, String code) {
+        responseMessage.setMessage("Passed ALL");
+        return responseMessage;
+    }
+
     @PostConstruct
     private void init() {
         books.add(new Book(1, "Reactive Spring", 484));

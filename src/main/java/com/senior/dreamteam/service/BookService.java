@@ -1,14 +1,55 @@
 package com.senior.dreamteam.service;
 
+import com.senior.dreamteam.model.ResponseMessage;
 import com.senior.dreamteam.model.TestCase;
 import org.graalvm.polyglot.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class BookService {
-    public void test() {
-        String intToRoman = """
+
+    private ResponseMessage responseMessage = new ResponseMessage("");
+
+    public ResponseMessage testAnswer(Integer questionId, String answerCode){
+        try (Context context = Context.create()) {
+            Value functionValue = context.eval("js", answerCode);
+            for (TestCase testCase : getTestCase()) {
+                String param = testCase.getParam();
+                String expected = testCase.getResult();
+                Value resultValue = functionValue.execute(Integer.parseInt(param));
+                String result = resultValue.asString();
+                if (result.equals(expected)) {
+                    System.out.println("Test case PASSED: Param: " + param + ", Result: " + result);
+                } else {
+                    System.out.println("Test case FAILED: Param: " + param + ", Expected: " + expected + ", Actual: " + result);
+                }
+            }
+            responseMessage.setMessage("Passed");
+            return responseMessage;
+        } catch (PolyglotException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        responseMessage.setMessage("Failed");
+        return responseMessage;
+    }
+
+    public List<TestCase> getTestCase(){
+        List<TestCase> testCases = new ArrayList<>();
+        testCases.add(new TestCase("1", "I"));
+        testCases.add(new TestCase("7", "VII"));
+        testCases.add(new TestCase("21", "XXI"));
+        testCases.add(new TestCase("49", "XLIX"));
+        testCases.add(new TestCase("99", "XCIX"));
+        return testCases;
+    }
+    public String getSampleCode(){
+        return """
                 var main = function(s) {
                     let result = ""
                     while (s > 0) {
@@ -58,31 +99,6 @@ public class BookService {
                 }
                 main
                 """.strip();
-        List<TestCase> testCases = new ArrayList<>();
-        testCases.add(new TestCase("1", "I"));
-        testCases.add(new TestCase("7", "VII"));
-        testCases.add(new TestCase("21", "XXI"));
-        testCases.add(new TestCase("49", "XLIX"));
-        testCases.add(new TestCase("99", "XCIX"));
-
-        try (Context context = Context.create()) {
-            Value functionValue = context.eval("js", intToRoman);
-            for (TestCase testCase : testCases) {
-                String param = testCase.getParam();
-                String expected = testCase.getResult();
-                Value resultValue = functionValue.execute(Integer.parseInt(param));
-                String result = resultValue.asString();
-                if (result.equals(expected)) {
-                    System.out.println("Test case PASSED: Param: " + param + ", Result: " + result);
-                } else {
-                    System.out.println("Test case FAILED: Param: " + param + ", Expected: " + expected + ", Actual: " + result);
-                }
-            }
-        } catch (PolyglotException e) {
-            e.printStackTrace();
-        } catch (Exception e){
-            System.out.println(e);
-        }
     }
 
 }

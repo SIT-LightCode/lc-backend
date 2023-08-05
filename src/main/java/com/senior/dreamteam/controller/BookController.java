@@ -4,6 +4,7 @@ import com.senior.dreamteam.model.Book;
 import com.senior.dreamteam.model.ResponseMessage;
 import com.senior.dreamteam.repository.BookRepository;
 import com.senior.dreamteam.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -15,11 +16,12 @@ import java.util.List;
 @Controller
 public class BookController {
 
-    private final BookRepository bookRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
-    public BookController(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    @Autowired
+    private BookService bookService;
+
 
     @SchemaMapping(typeName = "Query",value = "allBooks")
     public List<Book> findAll() {
@@ -43,8 +45,11 @@ public class BookController {
 
     @MutationMapping
     public ResponseMessage deleteBook(@Argument("id") Integer id) {
-        BookService bookService = new BookService();
-        bookService.test();
         return bookRepository.deleteBook(id);
+    }
+
+    @QueryMapping
+    public ResponseMessage testAnswer(@Argument("questionId") Integer questionId, @Argument("code") String code) {
+        return bookService.testAnswer(questionId, code);
     }
 }
