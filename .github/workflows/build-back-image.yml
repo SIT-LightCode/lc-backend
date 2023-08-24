@@ -24,7 +24,7 @@ jobs:
       with:
         images: ghcr.io/SIT-LightCode/back-end:
         tags: |
-          ${{ github.event.inputs.tags-name }}
+          ${{ github.event.inputs.image_tag }}
 
     - name: Build and push
       uses: docker/build-push-action@v2
