@@ -22,9 +22,9 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        images: ghcr.io/SIT-LightCode/back-end:${{ github.event.inputs.tags-name }}
+        images: ghcr.io/SIT-LightCode/back-end:
         tags: |
-          type=sha
+          ${{ github.event.inputs.tags-name }}
 
     - name: Build and push
       uses: docker/build-push-action@v2
