@@ -3,8 +3,8 @@ FROM maven:3.8.6-jdk-11-slim as build
 RUN ls
 WORKDIR /app
 
-COPY ./back-end/pom.xml .
-COPY ./back-end/src/ ./src/
+COPY .pom.xml .
+COPY ./src/ ./src/
 
 RUN mvn -Dmaven.test.skip package
 
