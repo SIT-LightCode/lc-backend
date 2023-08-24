@@ -22,7 +22,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        images: ghcr.io/SIT-LightCode/back-end
+        images: ghcr.io/SIT-LightCode/back-end:${{ github.event.inputs.tags-name }}
         tags: |
           type=sha
 
