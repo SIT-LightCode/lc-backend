@@ -1,4 +1,4 @@
-name: 'Build push back image'
+name: 'Build push snapshot back image '
 on:
   workflow_dispatch:
 
