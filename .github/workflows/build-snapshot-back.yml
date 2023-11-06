@@ -1,9 +1,6 @@
 name: 'Build push back image'
 on:
   workflow_dispatch:
-    inputs:
-      tags_name:
-        description: tag name
 
 jobs:
   build-back-image:
@@ -24,7 +21,7 @@ jobs:
       with:
         images: ghcr.io/SIT-LightCode/back-end
         tags: |
-          ${{ github.event.inputs.tags_name }}
+          type=sha
 
     - name: Build and push
       uses: docker/build-push-action@v2
