@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @Entity
@@ -22,10 +24,10 @@ public class Tag {
     String topic;
     String description;
 
-    @ManyToOne
-    Problem problem;
+//    @ManyToOne
+//    Problem problem;
 
-    @ManyToOne
-    Lesson lesson;
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    List<Lesson> lesson;
 
 }

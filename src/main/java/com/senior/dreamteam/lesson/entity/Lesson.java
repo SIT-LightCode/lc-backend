@@ -22,8 +22,8 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-    List<Tag> topics;
+    @ManyToOne
+    Tag tag;
 
     String name;
 

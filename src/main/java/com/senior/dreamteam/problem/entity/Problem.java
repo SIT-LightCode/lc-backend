@@ -25,8 +25,8 @@ public class Problem {
 
     String name;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    List<Tag> topics;
+//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+//    List<Tag> topics;
 
     String description;
 

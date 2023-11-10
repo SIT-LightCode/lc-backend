@@ -2,4 +2,6 @@ type Query {
     allBooks: [Book]
     findById(id: ID!): Book
     testAnswer(questionId: Int, code: String): ResponseMessage
+
+    getTag: [Tag]
 }

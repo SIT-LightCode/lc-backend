@@ -1,3 +1,0 @@
-type ResponseMessage {
-    message: String
-}
