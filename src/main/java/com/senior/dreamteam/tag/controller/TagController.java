@@ -13,7 +13,7 @@ public class TagController {
     @Autowired
     TagService tagService;
 
-    @SchemaMapping(typeName = "Query", value = "allBooks")
+    @SchemaMapping(typeName = "Query", value = "getTag")
     public List<Tag> findAll() {
         return tagService.findAll();
     }
