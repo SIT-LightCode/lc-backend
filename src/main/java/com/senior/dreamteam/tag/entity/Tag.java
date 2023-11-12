@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @Entity
@@ -17,15 +19,15 @@ import lombok.NoArgsConstructor;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    int id;
 
     String topic;
     String description;
 
-    @ManyToOne
-    Problem problem;
+//    @ManyToOne
+//    Problem problem;
 
-    @ManyToOne
-    Lesson lesson;
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    List<Lesson> lesson;
 
 }

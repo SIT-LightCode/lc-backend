@@ -1,0 +1,24 @@
+
+type Book {
+    id: ID!
+    title: String
+    pages: Int
+}
+
+type ResponseMessage {
+    message: String
+}
+
+type Tag {
+    id: Int
+    topic: String
+    description : String
+    lesson: [Lesson]
+}
+
+type Lesson {
+    id: Int
+    tag: Tag
+    name: String
+    content: String
+}

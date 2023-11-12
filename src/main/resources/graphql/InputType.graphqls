@@ -1,0 +1,6 @@
+input LessonInput {
+    id: Int
+    tagId: Int
+    name: String
+    content: String
+}

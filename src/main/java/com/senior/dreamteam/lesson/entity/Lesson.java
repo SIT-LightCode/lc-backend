@@ -20,10 +20,10 @@ import java.util.List;
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    int id;
 
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-    List<Tag> topics;
+    @ManyToOne
+    Tag tag;
 
     String name;
 
