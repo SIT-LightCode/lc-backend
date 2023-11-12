@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TagService {
@@ -15,5 +16,9 @@ public class TagService {
 
     public List<Tag> findAll(){
         return tagRepository.findAll();
+    }
+
+    public Optional<Tag> findAllById(int id){
+        return tagRepository.findTagById(id);
     }
 }
