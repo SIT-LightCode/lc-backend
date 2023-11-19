@@ -25,8 +25,10 @@ public class Lesson {
     @ManyToOne
     Tag tag;
 
+    @Column(length = 255)
     String name;
 
+    @Column(length = 20000)
     String content;
 
 }

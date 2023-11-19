@@ -21,7 +21,10 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
 
+    @Column(length = 255)
     String topic;
+
+    @Column(length = 1000)
     String description;
 
 //    @ManyToOne
