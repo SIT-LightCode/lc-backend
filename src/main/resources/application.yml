@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:lightcode}?createDatabaseIfNotExist=true&autoReconnect=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
     username: ${DB_USER:root}
-    password: ${DB_PASS:root}
+    password: ${DB_PASS:1234}
     driver-class-name: com.mysql.cj.jdbc.Driver
   graphql:
     path: /api/graphql
