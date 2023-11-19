@@ -4,3 +4,9 @@ input LessonInput {
     name: String
     content: String
 }
+
+input TagInput {
+    id: Int
+    topic: String
+    description: String
+}

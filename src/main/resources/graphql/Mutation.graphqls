@@ -1,4 +1,7 @@
 type Mutation {
     upsertLesson( lessonInput: LessonInput): Lesson
     removeLesson( lessonId: Int): String
+
+    upsertTag( tagInput: TagInput): Tag
+    removeTag( tagId: Int): String
 }
