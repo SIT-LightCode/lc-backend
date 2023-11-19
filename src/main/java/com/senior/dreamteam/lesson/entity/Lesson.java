@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Lesson {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @ManyToOne

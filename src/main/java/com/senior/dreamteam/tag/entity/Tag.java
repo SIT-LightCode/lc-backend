@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Tag {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @Column(length = 255)
