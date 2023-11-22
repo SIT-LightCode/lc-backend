@@ -1,38 +1,30 @@
-name: 'Build push back image'
+name: 'Build push snapshot back image '
 on:
   workflow_dispatch:
     inputs:
-      tags_name:
+      tag:
         description: tag name
+      type:
+        description: 'type of image is stable or not-stable'
+        required: true
+        default: 'not-stable'
+        type: choice
+        options:
+          - stable
+          - not-stable
 
 jobs:
   build-back-image:
     # needs: install-back-dependencies
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Login to GHCR
-      uses: docker/login-action@v1
+    - name: Use Build and Push Docker Image action
+      uses: SIT-LightCode/LC-Deployment/actions/build-push-back@action
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_PAT }}
-
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ghcr.io/SIT-LightCode/back-end
-        tags: |
-          ${{ github.event.inputs.tags_name }}
-          latest
-          stable
-
-    - name: Build and push
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: ./dockerfile
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        image: "back-end"
+        tags: ${{ inputs.tag }}
+        type: ${{ inputs.type }}
+        ghcr_pat: ${{ secrets.GHCR_PAT }}
+        mysql_database: ${{ secrets.MYSQL_DATABASE }}
+        mysql_user: ${{ secrets.MYSQL_USER }}
+        mysql_password: ${{ secrets.MYSQL_PASSWORD }} 

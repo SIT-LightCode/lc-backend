@@ -12,7 +12,11 @@ FROM openjdk:17-jdk-slim
 ARG JAR_FILE=/app/target/*.jar
 
 COPY --from=build ${JAR_FILE} app.jar
-
+ENV DB_NAME=${MYSQL_DATABASE}
+ENV DB_USER=${MYSQL_USER}
+ENV DB_PASS=${MYSQL_PASSWORD}
+ENV DB_HOST=db
+ENV DB_PORT=3306
 EXPOSE 8080
 
 ENTRYPOINT exec java -jar app.jar
