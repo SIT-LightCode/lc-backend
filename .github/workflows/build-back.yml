@@ -15,7 +15,6 @@ on:
 
 jobs:
   build-back-image:
-    # needs: install-back-dependencies
     runs-on: ubuntu-latest
     steps:
     - name: Use Build and Push Docker Image action
