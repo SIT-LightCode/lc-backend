@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Use Build and Push Docker Image action
-      uses: SIT-LightCode/LC-Deployment/actions/build-push-back@action
+      uses: SIT-LightCode/LC-Deployment/actions/build-push-back@main
       with:
         image: "back-end"
         tags: ${{ inputs.tag }}
