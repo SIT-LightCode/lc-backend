@@ -27,8 +27,8 @@ public class Tag {
     @Column(length = 1000)
     String description;
 
-//    @ManyToOne
-//    Problem problem;
+    @ManyToOne
+    Problem problem;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     List<Lesson> lesson;
