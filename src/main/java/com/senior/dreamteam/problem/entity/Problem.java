@@ -25,13 +25,13 @@ public class Problem {
 
     String name;
 
-//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-//    List<Tag> topics;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    List<Tag> tag;
 
     String description;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    List<Example> example;
+//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+//    List<Example> example;
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<Testcase> testcase;
