@@ -18,7 +18,7 @@ public class SeniorServicesApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("*").allowCredentials(true);
+                registry.addMapping("/**").allowedOrigins("http://172.21.0.3").allowCredentials(true);
             }
         };
     }
