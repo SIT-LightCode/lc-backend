@@ -5,9 +5,9 @@ on:
       tag:
         description: tag name
       type:
-        description: 'type of image is stable or not-stable'
+        description: 'type of image is stable or dev'
         required: true
-        default: 'not-stable'
+        default: 'dev'
         type: choice
         options:
           - stable
