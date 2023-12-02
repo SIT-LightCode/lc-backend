@@ -11,7 +11,7 @@ on:
         type: choice
         options:
           - stable
-          - not-stable
+          - dev
 
 jobs:
   build-back-image:
