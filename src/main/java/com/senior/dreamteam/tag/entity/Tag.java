@@ -1,8 +1,7 @@
 package com.senior.dreamteam.tag.entity;
 
+import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
 import com.senior.dreamteam.lesson.entity.Lesson;
-import com.senior.dreamteam.problem.entity.Problem;
-import com.senior.dreamteam.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,8 +26,8 @@ public class Tag {
     @Column(length = 1000)
     String description;
 
-    @ManyToOne
-    Problem problem;
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    List<TagProblem> tagProblems;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     List<Lesson> lesson;
