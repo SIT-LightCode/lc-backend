@@ -21,8 +21,8 @@ public class Submission {
     @ManyToOne
     User user;
 
-    @ManyToOne
-    Problem problem;
+//    @ManyToOne
+//    Problem problem;
 
     String code;
 

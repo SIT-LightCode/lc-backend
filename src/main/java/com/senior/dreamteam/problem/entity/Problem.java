@@ -1,10 +1,8 @@
 package com.senior.dreamteam.problem.entity;
 
 import com.senior.dreamteam.example.entity.Example;
-import com.senior.dreamteam.submisstion.entity.Submission;
-import com.senior.dreamteam.tag.entity.Tag;
+import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
 import com.senior.dreamteam.testcase.entity.Testcase;
-import com.senior.dreamteam.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,10 +23,16 @@ public class Problem {
 
     String name;
 
-//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-//    List<Tag> topics;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    List<TagProblem> tagProblems;
 
+    @Column(length = Integer.MAX_VALUE)
     String description;
+
+    @Column(length = Integer.MAX_VALUE)
+    String solution;
+
+    String typeparameter;
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<Example> example;
@@ -38,9 +42,9 @@ public class Problem {
 
     Long totalScore;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    List<Submission> submission;
+//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+//    List<Submission> submission;
 
-    @ManyToOne
-    User user;
+//    @ManyToOne
+//    User user;
 }

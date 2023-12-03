@@ -1,9 +1,8 @@
-package com.senior.dreamteam.lesson.entity;
+package com.senior.dreamteam.jointable.entities.tagproblem.entity;
 
-import com.senior.dreamteam.example.entity.Example;
+import com.senior.dreamteam.lesson.entity.Lesson;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.tag.entity.Tag;
-import com.senior.dreamteam.testcase.entity.Testcase;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,18 +16,17 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lesson {
+public class TagProblem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Long id;
 
     @ManyToOne
+    @JoinColumn(name = "tag_id")
     Tag tag;
 
-    @Column(length = 255)
-    String name;
-
-    @Column(length = Integer.MAX_VALUE)
-    String content;
-
+    @ManyToOne
+    @JoinColumn(name = "problem_id")
+    Problem problem;
 }
