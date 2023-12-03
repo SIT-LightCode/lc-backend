@@ -24,11 +24,15 @@ public class TagProblemService {
         return tagProblemRepository.findTagProblemById(id);
     }
 
+    public List<TagProblem> findTagProblemsByTagId(int id){
+        return tagProblemRepository.findTagProblemsByTagId(id);
+    }
+
     public TagProblem upsertTagProblem(TagProblem tagProblem ){
         return tagProblemRepository.save(tagProblem);
     }
 
-    public String removeTagById(int id){
+    public String removeTagProblemById(int id){
         try {
             Optional<TagProblem> tagProblemOptional = tagProblemRepository.findById(id);
 

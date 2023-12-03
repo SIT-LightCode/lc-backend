@@ -18,13 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 public class Problem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
 
     String name;
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    List<TagProblem> tagProblems;
+    List<TagProblem> tagProblem;
 
     @Column(length = Integer.MAX_VALUE)
     String description;
@@ -32,7 +32,7 @@ public class Problem {
     @Column(length = Integer.MAX_VALUE)
     String solution;
 
-    String typeparameter;
+    String typeParameter;
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<Example> example;
@@ -40,7 +40,7 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<Testcase> testcase;
 
-    Long totalScore;
+    int totalScore;
 
 //    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
 //    List<Submission> submission;

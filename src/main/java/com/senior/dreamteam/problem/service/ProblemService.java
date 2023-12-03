@@ -31,7 +31,7 @@ public class ProblemService {
         List<Testcase> testcases = testcaseRepository.findTestcasesByProblemId(problem.getId());
         try (Context context = Context.create()) {
             Value functionValue = context.eval("js", problem.getSolution());
-                if(problem.getTypeparameter() == "number"){
+                if(problem.getTypeParameter() == "number"){
 
                 }
 //                String param = testCase.getParam();

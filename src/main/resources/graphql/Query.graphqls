@@ -3,4 +3,12 @@ type Query {
     getTag: [Tag]
     getLesson: [Lesson]
     getLessonByTagId(id: ID): [Lesson]
+
+    getTagProblem: [TagProblem]
+    getTagProblemById(id: ID!): [TagProblem]
+    getTagProblemByTagId(id: ID!): [TagProblem]
+
+    getProblem: [Problem]
+    getProblemById(id: ID!): [Problem]
+
 }

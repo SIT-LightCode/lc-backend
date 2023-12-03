@@ -12,6 +12,6 @@ public interface TestcaseRepository extends JpaRepository<Testcase, Integer> {
 
     Optional<Testcase> findTestcaseById(int id);
 
-    List<Testcase> findTestcasesByProblemId(Long problemId);
+    List<Testcase> findTestcasesByProblemId(int problemId);
 
 }
