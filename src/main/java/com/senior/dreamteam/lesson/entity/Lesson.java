@@ -28,7 +28,7 @@ public class Lesson {
     @Column(length = 255)
     String name;
 
-    @Column(length = Integer.MAX_VALUE)
+    @Column(length = 65535,columnDefinition="Text")
     String content;
 
 }
