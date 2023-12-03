@@ -21,7 +21,7 @@ public class Example {
     String input;
     String output;
 
-    @ManyToOne
-    Problem problem;
+//    @ManyToOne
+//    Problem problem;
 
 }
