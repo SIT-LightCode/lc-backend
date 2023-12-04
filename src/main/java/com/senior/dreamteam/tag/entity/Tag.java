@@ -23,7 +23,7 @@ public class Tag {
     @Column(length = 255)
     String topic;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     String description;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)

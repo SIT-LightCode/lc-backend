@@ -26,10 +26,10 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<TagProblem> tagProblem;
 
-    @Column(length = Integer.MAX_VALUE)
+    @Column(columnDefinition = "TEXT")
     String description;
 
-    @Column(length = Integer.MAX_VALUE)
+    @Column(columnDefinition = "TEXT")
     String solution;
 
     String typeParameter;

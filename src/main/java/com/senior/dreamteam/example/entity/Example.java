@@ -1,7 +1,6 @@
 package com.senior.dreamteam.example.entity;
 
 import com.senior.dreamteam.problem.entity.Problem;
-import com.senior.dreamteam.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +20,7 @@ public class Example {
     String input;
     String output;
 
-//    @ManyToOne
-//    Problem problem;
+    @ManyToOne
+    Problem problem;
 
 }
