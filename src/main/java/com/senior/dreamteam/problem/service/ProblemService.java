@@ -45,7 +45,7 @@ public class ProblemService {
             context.eval("js", problem.getSolution());
 
             // Get the JavaScript function
-            Value jsFunction = context.getBindings("js").getMember("main");
+            Value jsFunction = context.getBindings("js").getMember("answer");
 
             // Generate a thousand sets of parameters
             List<Object> generatedParams = new ArrayList<>();
