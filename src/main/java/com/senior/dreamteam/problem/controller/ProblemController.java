@@ -32,15 +32,17 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertProblem")
-    public Problem upsertProblem(@Argument int id, @Argument String name, @Argument String description,
-                                 @Argument String solution, @Argument String typePaarameter, @Argument int totalScore
+    public Problem upsertProblem(@Argument Integer id, @Argument String name, @Argument String description,
+                                 @Argument String solution, @Argument String typeParameter, @Argument int totalScore
     ) {
         Problem problem = new Problem();
-        problem.setId(id);
+        if (id != null) {
+            problem.setId(id);
+        }
         problem.setName(name);
         problem.setDescription(description);
         problem.setSolution(solution);
-        problem.setTypeParameter(typePaarameter);
+        problem.setTypeParameter(typeParameter);
         problem.setTotalScore(totalScore);
         return problemService.upsertProblem(problem);
     }
