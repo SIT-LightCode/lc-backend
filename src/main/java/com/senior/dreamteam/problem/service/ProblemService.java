@@ -17,6 +17,9 @@ import org.graalvm.polyglot.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.script.ScriptEngine;
+
+
 @Service
 public class ProblemService {
 
@@ -35,36 +38,56 @@ public class ProblemService {
 
     public Problem upsertProblem(Problem problem) {
         try (Context context = Context.create()) {
-            System.out.println("in services");
             JSONObject typeParameters = new JSONObject(problem.getTypeParameter());
             System.out.println("before json");
 
             // Prepare the JavaScript function
-//        context.eval("js", problem.getSolution());
+            context.eval("js", problem.getSolution());
 
             // Get the JavaScript function
-//        Value jsFunction = context.getBindings("js").getMember("main"); // Replace "calculate" with your actual JS function name
+            Value jsFunction = context.getBindings("js").getMember("main");
 
             // Generate a thousand sets of parameters
+            List<Object> generatedParams = new ArrayList<>();
             for (int i = 0; i < 1000; i++) {
+                JSONObject newParams = new JSONObject();
                 Iterator keys = typeParameters.keys();
                 while (keys.hasNext()) {
                     String key = (String) keys.next();
                     Object param = new JSONTokener(typeParameters.getString(key)).nextValue();
                     Object newParam = generateNewValue(param);
-                    System.out.println(newParam);
+                    newParams.put(key, newParam);
+                }
+                generatedParams.add(newParams);
+            }
 
-                    // Execute the JavaScript function with the generated parameter
-//                Value result = jsFunction.execute(newParam);
+            // Execute the JavaScript function with the generated parameters
+            for (Object params : generatedParams) {
+                JSONObject paramsObj = (JSONObject) params;
+                Value[] args = new Value[paramsObj.length()];
+                int index = 0;
+                Iterator keys = paramsObj.keys();
+                System.out.println("paramsObj: " + paramsObj);
+                System.out.println("keys: " + keys);
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    args[index++] = Value.asValue(paramsObj.get(key));
+                }
+                System.out.println("args: " + args);
+                Value result = jsFunction.execute(args);
+                System.out.println("params: " + params.toString());
+                System.out.println(result.toString());
 
-                    // Save the result to the database
-                    Problem problemSaved = problemRepository.save(problem);
-                    try {
-//                    Testcase testcase = new Testcase(null, newParam.toString(), result.toString(), problemSaved);
-//                    testcaseService.upsertTestcase(testcase);
-                    } catch (Exception e){
-                        problemRepository.deleteById(problemSaved.getId());
-                    }
+                Value resultTest = jsFunction.execute("[0,0,1,2,4]", "1");
+                System.out.println(resultTest.toString());
+                // Save the result to the database
+                Problem problemSaved = problemRepository.save(problem);
+                try {
+                    // Save the testcase with the generated parameters and result
+                    // Testcase testcase = new Testcase(null, params.toString(), result.toString(), problemSaved);
+                    // testcaseService.upsertTestcase(testcase);
+                } catch (Exception e){
+                    problemRepository.deleteById(problemSaved.getId());
                 }
             }
             return null;
@@ -76,6 +99,7 @@ public class ProblemService {
         }
         return problemRepository.save(problem);
     }
+
 
     private Object generateNewValue(Object param) throws JSONException {
         if (param instanceof JSONArray jsonArray) {
@@ -98,7 +122,7 @@ public class ProblemService {
             return newObject.toString();
         } else if (param instanceof Number) {
             // Generate a new random number
-            return new Random().nextInt(1000);
+            return new Random().nextInt(10);
         } else if (param instanceof String) {
             // Generate a new random string
             return UUID.randomUUID().toString();
