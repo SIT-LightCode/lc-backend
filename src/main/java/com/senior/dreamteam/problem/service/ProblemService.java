@@ -77,9 +77,6 @@ public class ProblemService {
                 Value result = jsFunction.execute(args);
                 System.out.println("params: " + params.toString());
                 System.out.println(result.toString());
-
-                Value resultTest = jsFunction.execute("[0,0,1,2,4]", "1");
-                System.out.println(resultTest.toString());
                 // Save the result to the database
                 Problem problemSaved = problemRepository.save(problem);
                 try {
