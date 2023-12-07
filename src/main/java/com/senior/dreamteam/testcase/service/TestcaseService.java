@@ -28,6 +28,11 @@ public class TestcaseService {
         return testcaseRepository.findTestcaseById(id);
     }
 
+    public List<Testcase> findTestcasesByProblemId(int id){
+        return testcaseRepository.findTestcasesByProblemId(id);
+    }
+
+
     public Testcase upsertTestcase(Testcase testcase){
         return testcaseRepository.save(testcase);
     }
