@@ -34,6 +34,9 @@ springdoc:
     tags-sorter: alpha
     filter: true
 
+webclient:
+  base-url:
+    js-server: ${dogurlNaTusKingKib:http://localhost:8000}
 # incase port 8080 is already in use
 #server:
 #  port: 5000
