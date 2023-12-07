@@ -18,29 +18,29 @@ import java.util.List;
 @AllArgsConstructor
 public class Problem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
 
     String name;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    List<TagProblem> tagProblems;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<TagProblem> tagProblem;
 
-    @Column(length = Integer.MAX_VALUE)
+    @Column(columnDefinition = "TEXT")
     String description;
 
-    @Column(length = Integer.MAX_VALUE)
+    @Column(columnDefinition = "TEXT")
     String solution;
 
-    String typeparameter;
+    String exampleParameter;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Example> example;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Testcase> testcase;
 
-    Long totalScore;
+    int totalScore;
 
 //    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
 //    List<Submission> submission;

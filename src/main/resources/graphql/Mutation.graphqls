@@ -3,5 +3,11 @@ type Mutation {
     removeLesson( lessonId: Int): String
 
     upsertTag( tagInput: TagInput): Tag
-    removeTag( tagId: Int): String
+    removeTag( tagId: Int!): String
+
+    upsertTagProblem(id: Int, tagId: Int!, problemId: Int!): TagProblem
+    removeTagProblem(id: Int!): String
+
+    upsertProblem(id: Int, arrayTagId: String, name: String, description: String, solution: String, exampleParameter: String, totalScore: Int): Problem
+    removeProblem(id: Int!): String
 }

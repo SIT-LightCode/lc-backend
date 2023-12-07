@@ -12,4 +12,5 @@ public interface ProblemRepository extends JpaRepository<Problem, Integer> {
     List<Problem> findAll();
     Optional<Problem> findProblemById(int id);
 
+
 }

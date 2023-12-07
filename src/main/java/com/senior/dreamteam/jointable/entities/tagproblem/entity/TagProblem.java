@@ -20,13 +20,11 @@ public class TagProblem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    int id;
 
     @ManyToOne
-    @JoinColumn(name = "tag_id")
     Tag tag;
 
     @ManyToOne
-    @JoinColumn(name = "problem_id")
     Problem problem;
 }

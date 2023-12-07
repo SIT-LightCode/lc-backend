@@ -13,6 +13,7 @@ public interface TagProblemRepository extends JpaRepository<TagProblem, Integer>
     List<TagProblem> findAll();
     Optional<TagProblem> findTagProblemById(int id);
 
-    List<TagProblem> findTagProblemsByProblemId(Long problemId);
+    List<TagProblem> findTagProblemsByProblemId(int problemId);
+    List<TagProblem> findTagProblemsByTagId(int tagId);
 
-    List<TagProblem> findTagProblemsByTagId(Long tagId);}
+}

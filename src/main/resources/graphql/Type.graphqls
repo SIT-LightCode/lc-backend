@@ -22,3 +22,35 @@ type Lesson {
     name: String
     content: String
 }
+
+type TagProblem {
+    id: Int
+    tag: Tag
+    problem : Problem
+}
+
+type Problem {
+    id: Int
+    name: String
+    tagProblem: [TagProblem]
+    description: String
+    solution: String
+    exampleParameter: String
+    example: [Example]
+    testcase: [Testcase]
+    totalScore: Int
+}
+
+type Example {
+    id: Int
+    input: String
+    output: String
+    problem: [Problem]
+}
+
+type Testcase {
+    id: Int
+    input: String
+    output: String
+    problem: [Problem]
+}
