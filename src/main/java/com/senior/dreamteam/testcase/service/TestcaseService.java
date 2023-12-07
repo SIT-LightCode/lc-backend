@@ -28,10 +28,13 @@ public class TestcaseService {
         return testcaseRepository.findTestcaseById(id);
     }
 
-    public List<Testcase> findTestcasesByProblemId(int id){
-        return testcaseRepository.findTestcasesByProblemId(id);
+    public List<Testcase> findTestcasesByProblemId(int problemId){
+        return testcaseRepository.findTestcasesByProblemId(problemId);
     }
 
+    public void removeTestcasesByProblemId(int problemId) {
+        testcaseRepository.deleteTestcasesByProblemId(problemId);
+    }
 
     public Testcase upsertTestcase(Testcase testcase){
         return testcaseRepository.save(testcase);

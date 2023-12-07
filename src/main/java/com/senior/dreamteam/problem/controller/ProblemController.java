@@ -6,6 +6,7 @@ import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.service.ProblemService;
 import com.senior.dreamteam.tag.entity.Tag;
 import com.senior.dreamteam.tag.service.TagService;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -34,7 +35,7 @@ public class ProblemController {
     @SchemaMapping(typeName = "Mutation", value = "upsertProblem")
     public Problem upsertProblem(@Argument Integer id, @Argument String name, @Argument String description,
                                  @Argument String solution, @Argument String typeParameter, @Argument int totalScore
-    ) {
+    ) throws JSONException {
         Problem problem = new Problem();
         if (id != null) {
             problem.setId(id);

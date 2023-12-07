@@ -28,6 +28,8 @@ public class ProblemService {
     @Autowired
     CompilingService compilingService;
 
+    int PARAM_GENERATION_COUNT = 1500;
+
     public List<Problem> findAll() {
         return problemRepository.findAll();
     }
@@ -36,72 +38,130 @@ public class ProblemService {
         return problemRepository.findProblemById(id);
     }
 
-    public Problem upsertProblem(Problem problem) {
+    public Problem upsertProblem(Problem problem) throws JSONException {
+        String lang = "js";
+        Problem problemSaved = problemRepository.save(problem);
+        JSONObject typeParameters = new JSONObject(problem.getTypeParameter());
+
+        List<Object> generatedParams = generateParameters(typeParameters, PARAM_GENERATION_COUNT);
+        executeAndSaveTestcases(problemSaved, generatedParams, lang);
+
+        return problemSaved;
+    }
+
+    public String removeProblmById(int id) {
         try {
-            String lang = "js";
-            JSONObject typeParameters = new JSONObject(problem.getTypeParameter());
-            Problem problemSaved = problemRepository.save(problem);
+            Optional<Problem> problemOptional = problemRepository.findById(id);
 
-            // Generate a thousand sets of parameters
-            List<Object> generatedParams = new ArrayList<>();
-            for (int i = 0; i < 1500; i++) {
-                JSONObject newParams = new JSONObject();
-                Iterator keys = typeParameters.keys();
-                while (keys.hasNext()) {
-                    String key = (String) keys.next();
-                    Object param = new JSONTokener(typeParameters.getString(key)).nextValue();
-                    Object newParam = generateNewValue(param);
-                    newParams.put(key, newParam);
-                }
-                // Convert JSONObject to List<Object>
-                List<Object> paramsList = new ArrayList<>();
-                Iterator<String> keysIterator = newParams.keys();
-                while (keysIterator.hasNext()) {
-                    String key = keysIterator.next();
-                    Object value = newParams.get(key);
-                    if (value instanceof String && ((String) value).startsWith("[")) {
-                        // Parse the string as a JSONArray
-                        JSONArray jsonArray = new JSONArray((String) value);
-                        // Manually convert JSONArray to List<Object>
-                        List<Object> arrayAsList = new ArrayList<>();
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            arrayAsList.add(jsonArray.get(j));
-                        }
-                        paramsList.add(arrayAsList);
-                    } else {
-                        // Add other values directly
-                        paramsList.add(value);
-                    }
-                }
-                generatedParams.add(paramsList);
+            if (problemOptional.isPresent()) {
+                problemRepository.deleteById(id);
+                return "Problem removed successfully";
+            } else {
+                return "Problem not found with ID: " + id;
             }
-
-            // Execute the JavaScript function with the generated parameters
-            for (Object params : generatedParams) {
-                System.out.println(params.toString());
-                try {
-                    JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
-                    String returnValue = compilingService.postData(jsonBody, lang);
-                    String result = compilingService.handleResponse(returnValue);
-                    // Save the testcase with the generated parameters and result
-                    Testcase testcase = new Testcase();
-                    testcase.setProblem(problemSaved);
-                    testcase.setInput(params.toString());
-                    testcase.setOutput(result);
-                    testcaseService.upsertTestcase(testcase);
-                } catch (Exception e) {
-                    System.out.println("catch: " + e.getMessage());
-                    testcaseService.findTestcasesByProblemId(problemSaved.getId());
-                    problemRepository.deleteById(problemSaved.getId());
-                    throw new DemoGraphqlException("An error occured: " + e.getMessage(), 404);
-                }
-            }
-            return problemSaved;
         } catch (Exception e) {
-            throw new DemoGraphqlException("An error occured: " + e.getMessage(), 404);
+            return "An error occurred: " + e.getMessage();
         }
     }
 
+    private List<Object> generateParameters(JSONObject typeParameters, int count) throws JSONException {
+        List<Object> generatedParams = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            JSONObject newParams = generateSingleSetOfParams(typeParameters);
+            generatedParams.add(convertParamsToList(newParams));
+        }
+        return generatedParams;
+    }
+
+    private JSONObject generateSingleSetOfParams(JSONObject typeParameters) throws JSONException {
+        JSONObject newParams = new JSONObject();
+        Iterator<String> keys = typeParameters.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object param = new JSONTokener(typeParameters.getString(key)).nextValue();
+            newParams.put(key, generateNewValue(param));
+        }
+        return newParams;
+    }
+
+    private List<Object> convertParamsToList(JSONObject newParams) throws JSONException {
+        List<Object> paramsList = new ArrayList<>();
+        Iterator<String> keysIterator = newParams.keys();
+        while (keysIterator.hasNext()) {
+            String key = keysIterator.next();
+            Object value = newParams.get(key);
+            paramsList.add(parseValue(value));
+        }
+        return paramsList;
+    }
+
+    private Object parseValue(Object value) throws JSONException {
+        if (value instanceof String && ((String) value).startsWith("[")) {
+            JSONArray jsonArray = new JSONArray((String) value);
+            return jsonArrayToList(jsonArray);
+        }
+        return value;
+    }
+
+    private List<Object> jsonArrayToList(JSONArray jsonArray) throws JSONException {
+        List<Object> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            Object item = jsonArray.get(i);
+            if (item instanceof JSONArray) {
+                list.add(jsonArrayToList((JSONArray) item));
+            } else if (item instanceof JSONObject) {
+                list.add(jsonObjectToMap((JSONObject) item));
+            } else {
+                list.add(item);
+            }
+        }
+        return list;
+    }
+
+    private Map<String, Object> jsonObjectToMap(JSONObject jsonObject) throws JSONException {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.get(key);
+            if (value instanceof JSONArray) {
+                map.put(key, jsonArrayToList((JSONArray) value));
+            } else if (value instanceof JSONObject) {
+                map.put(key, jsonObjectToMap((JSONObject) value));
+            } else {
+                map.put(key, value);
+            }
+        }
+        return map;
+    }
+
+    private void executeAndSaveTestcases(Problem problem, List<Object> generatedParams, String lang) {
+        for (Object params : generatedParams) {
+            try {
+                JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
+                String returnValue = compilingService.postData(jsonBody, lang);
+                String result = compilingService.handleResponse(returnValue);
+                saveTestcase(problem, params, result);
+            } catch (Exception e) {
+                handleTestcaseError(problem, e);
+                break;
+            }
+        }
+    }
+
+    private void saveTestcase(Problem problem, Object params, String result) {
+        Testcase testcase = new Testcase();
+        testcase.setProblem(problem);
+        testcase.setInput(params.toString());
+        testcase.setOutput(result);
+        testcaseService.upsertTestcase(testcase);
+    }
+
+    private void handleTestcaseError(Problem problem, Exception e) {
+        testcaseService.removeTestcasesByProblemId(problem.getId());
+        problemRepository.deleteById(problem.getId());
+        throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 404);
+    }
 
     private Object generateNewValue(Object param) throws JSONException {
         if (param instanceof JSONArray jsonArray) {
@@ -132,27 +192,6 @@ public class ProblemService {
         } else {
             // Default to string if type is unknown
             return param.toString();
-        }
-    }
-
-
-    private void saveParameterAndResult(Object param, int result) {
-        // Implement your logic to save the parameter and result here
-        System.out.println("Parameter: " + param + ", Result: " + result);
-    }
-
-    public String removeProblmById(int id) {
-        try {
-            Optional<Problem> problemOptional = problemRepository.findById(id);
-
-            if (problemOptional.isPresent()) {
-                problemRepository.deleteById(id);
-                return "Problem removed successfully";
-            } else {
-                return "Problem not found with ID: " + id;
-            }
-        } catch (Exception e) {
-            return "An error occurred: " + e.getMessage();
         }
     }
 }
