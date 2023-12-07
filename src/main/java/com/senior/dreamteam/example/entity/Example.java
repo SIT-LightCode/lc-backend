@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Example {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    int id;
 
     String input;
     String output;

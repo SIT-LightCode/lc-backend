@@ -1,5 +1,7 @@
 package com.senior.dreamteam.problem.service;
 
+import com.senior.dreamteam.example.entity.Example;
+import com.senior.dreamteam.example.service.ExampleService;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.repository.ProblemRepository;
@@ -26,6 +28,9 @@ public class ProblemService {
     TestcaseService testcaseService;
 
     @Autowired
+    ExampleService exampleService;
+
+    @Autowired
     CompilingService compilingService;
 
     int PARAM_GENERATION_COUNT = 1500;
@@ -40,13 +45,21 @@ public class ProblemService {
 
     public Problem upsertProblem(Problem problem) throws JSONException {
         String lang = "js";
+        Boolean isExample = true;
         Problem problemSaved = problemRepository.save(problem);
-        JSONObject typeParameters = new JSONObject(problem.getTypeParameter());
 
-        List<Object> generatedParams = generateParameters(typeParameters, PARAM_GENERATION_COUNT);
-        executeAndSaveTestcases(problemSaved, generatedParams, lang);
+        JSONArray typeParametersArray = new JSONArray(problem.getTypeParameter());
+        List<Object> exampleParameters = new ArrayList<>();
+        for (int i = 0; i < typeParametersArray.length(); i++) {
+            JSONObject typeParametersObject = typeParametersArray.getJSONObject(i);
+            exampleParameters.add(convertParamsToList(typeParametersObject));
+        }
+        executeAndSaveTest(problemSaved, exampleParameters, lang, isExample);
 
-        return problemSaved;
+        List<Object> generatedParams = generateParameters(typeParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
+        executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
+
+        return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
     public String removeProblmById(int id) {
@@ -135,13 +148,18 @@ public class ProblemService {
         return map;
     }
 
-    private void executeAndSaveTestcases(Problem problem, List<Object> generatedParams, String lang) {
-        for (Object params : generatedParams) {
+    private void executeAndSaveTest(Problem problem, List<Object> TestParams, String lang, Boolean isExample) {
+        // save testCase or Example
+        for (Object params : TestParams) {
             try {
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
                 String returnValue = compilingService.postData(jsonBody, lang);
                 String result = compilingService.handleResponse(returnValue);
-                saveTestcase(problem, params, result);
+                if (isExample) {
+                    saveExample(problem, params, result);
+                } else {
+                    saveTestcase(problem, params, result);
+                }
             } catch (Exception e) {
                 handleTestcaseError(problem, e);
                 break;
@@ -155,6 +173,14 @@ public class ProblemService {
         testcase.setInput(params.toString());
         testcase.setOutput(result);
         testcaseService.upsertTestcase(testcase);
+    }
+
+    private void saveExample(Problem problem, Object params, String result) {
+        Example example = new Example();
+        example.setProblem(problem);
+        example.setInput(params.toString());
+        example.setOutput(result);
+        exampleService.upsertExample(example);
     }
 
     private void handleTestcaseError(Problem problem, Exception e) {
