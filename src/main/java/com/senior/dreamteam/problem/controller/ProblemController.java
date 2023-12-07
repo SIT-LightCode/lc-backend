@@ -57,7 +57,7 @@ public class ProblemController {
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")
     public String removeTagProblem(@Argument int id) {
-        return problemService.removeProblmById(id);
+        return problemService.removeProblemById(id);
     }
 
 }

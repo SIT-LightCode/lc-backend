@@ -62,7 +62,7 @@ public class ProblemService {
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
-    public String removeProblmById(int id) {
+    public String removeProblemById(int id) {
         try {
             Optional<Problem> problemOptional = problemRepository.findById(id);
 

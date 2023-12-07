@@ -23,7 +23,7 @@ public class Problem {
 
     String name;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<TagProblem> tagProblem;
 
     @Column(columnDefinition = "TEXT")
@@ -34,10 +34,10 @@ public class Problem {
 
     String exampleParameter;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Example> example;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Testcase> testcase;
 
     int totalScore;
