@@ -32,7 +32,7 @@ public class Problem {
     @Column(columnDefinition = "TEXT")
     String solution;
 
-    String typeParameter;
+    String exampleParameter;
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     List<Example> example;

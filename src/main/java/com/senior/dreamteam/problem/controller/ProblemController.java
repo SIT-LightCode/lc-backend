@@ -22,6 +22,9 @@ public class ProblemController {
     @Autowired
     TagService tagService;
 
+    @Autowired
+    TagProblemService tagProblemService;
+
     @SchemaMapping(typeName = "Query", value = "getProblem")
     public List<Problem> findAll() {
         return problemService.findAll();
@@ -34,7 +37,8 @@ public class ProblemController {
 
     @SchemaMapping(typeName = "Mutation", value = "upsertProblem")
     public Problem upsertProblem(@Argument Integer id, @Argument String name, @Argument String description,
-                                 @Argument String solution, @Argument String typeParameter, @Argument int totalScore
+                                 @Argument String arrayTagId,
+                                 @Argument String solution, @Argument String exampleParameter, @Argument int totalScore
     ) throws JSONException {
         Problem problem = new Problem();
         if (id != null) {
@@ -43,9 +47,12 @@ public class ProblemController {
         problem.setName(name);
         problem.setDescription(description);
         problem.setSolution(solution);
-        problem.setTypeParameter(typeParameter);
+        problem.setExampleParameter(exampleParameter);
         problem.setTotalScore(totalScore);
-        return problemService.upsertProblem(problem);
+        Problem result = problemService.upsertProblem(problem);
+        System.out.println("be4 tag_pro");
+        tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(result, arrayTagId);
+        return result;
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")

@@ -48,15 +48,15 @@ public class ProblemService {
         Boolean isExample = true;
         Problem problemSaved = problemRepository.save(problem);
 
-        JSONArray typeParametersArray = new JSONArray(problem.getTypeParameter());
+        JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
         List<Object> exampleParameters = new ArrayList<>();
-        for (int i = 0; i < typeParametersArray.length(); i++) {
-            JSONObject typeParametersObject = typeParametersArray.getJSONObject(i);
-            exampleParameters.add(convertParamsToList(typeParametersObject));
+        for (int i = 0; i < exampleParametersArray.length(); i++) {
+            JSONObject exampleParametersObject = exampleParametersArray.getJSONObject(i);
+            exampleParameters.add(convertParamsToList(exampleParametersObject));
         }
         executeAndSaveTest(problemSaved, exampleParameters, lang, isExample);
 
-        List<Object> generatedParams = generateParameters(typeParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
+        List<Object> generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
 
         return problemRepository.findProblemById(problemSaved.getId()).get();
@@ -77,21 +77,21 @@ public class ProblemService {
         }
     }
 
-    private List<Object> generateParameters(JSONObject typeParameters, int count) throws JSONException {
+    private List<Object> generateParameters(JSONObject exampleParameters, int count) throws JSONException {
         List<Object> generatedParams = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            JSONObject newParams = generateSingleSetOfParams(typeParameters);
+            JSONObject newParams = generateSingleSetOfParams(exampleParameters);
             generatedParams.add(convertParamsToList(newParams));
         }
         return generatedParams;
     }
 
-    private JSONObject generateSingleSetOfParams(JSONObject typeParameters) throws JSONException {
+    private JSONObject generateSingleSetOfParams(JSONObject exampleParameters) throws JSONException {
         JSONObject newParams = new JSONObject();
-        Iterator<String> keys = typeParameters.keys();
+        Iterator<String> keys = exampleParameters.keys();
         while (keys.hasNext()) {
             String key = keys.next();
-            Object param = new JSONTokener(typeParameters.getString(key)).nextValue();
+            Object param = new JSONTokener(exampleParameters.getString(key)).nextValue();
             newParams.put(key, generateNewValue(param));
         }
         return newParams;

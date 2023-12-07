@@ -35,7 +35,7 @@ type Problem {
     tagProblem: [TagProblem]
     description: String
     solution: String
-    typeParameter: String
+    exampleParameter: String
     example: [Example]
     testcase: [Testcase]
     totalScore: Int
