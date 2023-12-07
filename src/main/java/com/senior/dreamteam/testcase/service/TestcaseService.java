@@ -1,14 +1,7 @@
 package com.senior.dreamteam.testcase.service;
 
-import com.senior.dreamteam.problem.entity.Problem;
-import com.senior.dreamteam.problem.repository.ProblemRepository;
 import com.senior.dreamteam.testcase.entity.Testcase;
 import com.senior.dreamteam.testcase.repository.TestcaseRepository;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.PolyglotException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +13,15 @@ public class TestcaseService {
     @Autowired
     TestcaseRepository testcaseRepository;
 
-    public List<Testcase> findAll(){
+    public List<Testcase> findAll() {
         return testcaseRepository.findAll();
     }
 
-    public Optional<Testcase> findAllById(int id){
+    public Optional<Testcase> findAllById(int id) {
         return testcaseRepository.findTestcaseById(id);
     }
 
-    public List<Testcase> findTestcasesByProblemId(int problemId){
+    public List<Testcase> findTestcasesByProblemId(int problemId) {
         return testcaseRepository.findTestcasesByProblemId(problemId);
     }
 
@@ -36,9 +29,12 @@ public class TestcaseService {
         testcaseRepository.deleteTestcasesByProblemId(problemId);
     }
 
-    public Testcase upsertTestcase(Testcase testcase){
+    public Testcase upsertTestcase(Testcase testcase) {
         return testcaseRepository.save(testcase);
     }
 
+    public List<Testcase> saveAll(List<Testcase> testcaseList) {
+        return testcaseRepository.saveAll(testcaseList);
+    }
 
 }

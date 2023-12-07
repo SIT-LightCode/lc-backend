@@ -148,39 +148,42 @@ public class ProblemService {
         return map;
     }
 
-    private void executeAndSaveTest(Problem problem, List<Object> TestParams, String lang, Boolean isExample) {
-        // save testCase or Example
-        for (Object params : TestParams) {
+    private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
+        List<Testcase> testcases = new ArrayList<>();
+        List<Example> examples = new ArrayList<>();
+
+        for (Object params : testParams) {
             try {
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
                 String returnValue = compilingService.postData(jsonBody, lang);
                 String result = compilingService.handleResponse(returnValue);
+
                 if (isExample) {
-                    saveExample(problem, params, result);
+                    Example example = new Example();
+                    example.setProblem(problem);
+                    example.setInput(params.toString());
+                    example.setOutput(result);
+                    examples.add(example);
                 } else {
-                    saveTestcase(problem, params, result);
+                    Testcase testcase = new Testcase();
+                    testcase.setProblem(problem);
+                    testcase.setInput(params.toString());
+                    testcase.setOutput(result);
+                    testcases.add(testcase);
                 }
             } catch (Exception e) {
                 handleTestcaseError(problem, e);
-                break;
+                return; // Exit the method if an error occurs
             }
         }
-    }
 
-    private void saveTestcase(Problem problem, Object params, String result) {
-        Testcase testcase = new Testcase();
-        testcase.setProblem(problem);
-        testcase.setInput(params.toString());
-        testcase.setOutput(result);
-        testcaseService.upsertTestcase(testcase);
-    }
-
-    private void saveExample(Problem problem, Object params, String result) {
-        Example example = new Example();
-        example.setProblem(problem);
-        example.setInput(params.toString());
-        example.setOutput(result);
-        exampleService.upsertExample(example);
+        // Save all test cases and examples at once
+        if (!examples.isEmpty()) {
+            exampleService.saveAll(examples);
+        }
+        if (!testcases.isEmpty()) {
+            testcaseService.saveAll(testcases);
+        }
     }
 
     private void handleTestcaseError(Problem problem, Exception e) {

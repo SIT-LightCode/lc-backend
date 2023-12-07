@@ -36,5 +36,9 @@ public class ExampleService {
         return exampleRepository.save(example);
     }
 
+    public List<Example> saveAll(List<Example> exampleList){
+        return exampleRepository.saveAll(exampleList);
+    }
+
 
 }
