@@ -43,7 +43,9 @@ public class TagProblemService {
 
     public Boolean upsertMultiTagProblemByProblemAndArrTagId(Problem problem, String arrayTagId) throws JSONException {
         try {
-            tagProblemRepository.removeTagProblemsByProblemId(problem.getId());
+            if(problem.getId() != 0) {
+                tagProblemRepository.removeTagProblemsByProblemId(problem.getId());
+            }
             JSONArray tagIds = new JSONArray(arrayTagId);
             List<TagProblem> tagProblems = new ArrayList<>();
             for (int i = 0; i < tagIds.length(); i++) {
