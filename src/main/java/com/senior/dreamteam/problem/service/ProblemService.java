@@ -44,10 +44,13 @@ public class ProblemService {
     }
 
     public Problem upsertProblem(Problem problem) throws JSONException {
+        if (problem.getId() != 0) {
+            return problemRepository.save(problem);
+        }
         String lang = "js";
         Boolean isExample = true;
         Problem problemSaved = problemRepository.save(problem);
-
+        System.out.println("here");
         JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
         List<Object> exampleParameters = new ArrayList<>();
         for (int i = 0; i < exampleParametersArray.length(); i++) {
@@ -149,6 +152,7 @@ public class ProblemService {
     }
 
     private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
+        System.out.println(problem.getId());
         List<Testcase> testcases = new ArrayList<>();
         List<Example> examples = new ArrayList<>();
 

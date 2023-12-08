@@ -1,10 +1,8 @@
 package com.senior.dreamteam.problem.controller;
 
-import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
 import com.senior.dreamteam.jointable.entities.tagproblem.service.TagProblemService;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.service.ProblemService;
-import com.senior.dreamteam.tag.entity.Tag;
 import com.senior.dreamteam.tag.service.TagService;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +40,12 @@ public class ProblemController {
     ) throws JSONException {
         Problem problem = new Problem();
         if (id != null) {
-            problem.setId(id);
+            problem = problemService.findAllById(id).get();
+            problem.setName(name);
+            problem.setDescription(description);
+            problem.setTotalScore(totalScore);
+            tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(problem, arrayTagId);
+            return problemService.upsertProblem(problem);
         }
         problem.setName(name);
         problem.setDescription(description);
