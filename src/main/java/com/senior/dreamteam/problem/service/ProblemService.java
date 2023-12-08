@@ -3,7 +3,10 @@ package com.senior.dreamteam.problem.service;
 import com.senior.dreamteam.example.entity.Example;
 import com.senior.dreamteam.example.service.ExampleService;
 import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.problem.entity.CheckAnswerResult;
+import com.senior.dreamteam.problem.entity.ExampleResult;
 import com.senior.dreamteam.problem.entity.Problem;
+import com.senior.dreamteam.problem.entity.TestcaseResult;
 import com.senior.dreamteam.problem.repository.ProblemRepository;
 import com.senior.dreamteam.testcase.entity.Testcase;
 import com.senior.dreamteam.testcase.service.CompilingService;
@@ -33,7 +36,9 @@ public class ProblemService {
     @Autowired
     CompilingService compilingService;
 
-    int PARAM_GENERATION_COUNT = 1500;
+    private final int PARAM_GENERATION_COUNT = 1500;
+    private int randomNumberCount = 0;
+
 
     public List<Problem> findAll() {
         return problemRepository.findAll();
@@ -97,6 +102,7 @@ public class ProblemService {
             Object param = new JSONTokener(exampleParameters.getString(key)).nextValue();
             newParams.put(key, generateNewValue(param));
         }
+        randomNumberCount = 0;
         return newParams;
     }
 
@@ -217,8 +223,7 @@ public class ProblemService {
             return newObject.toString();
         } else if (param instanceof Number) {
             // Generate a new random number
-            int bound = 200;
-            return new Random().nextInt(bound) - bound / 4;
+            return generateRandomNumber();
         } else if (param instanceof String) {
             // Generate a new random string
             return UUID.randomUUID().toString();
@@ -226,5 +231,68 @@ public class ProblemService {
             // Default to string if type is unknown
             return param.toString();
         }
+    }
+
+    private int generateRandomNumber() {
+        List<Integer> specialNumbers = Arrays.asList(0, 1, -1, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        Random random = new Random();
+        int bound;
+        if (randomNumberCount < 200) {
+            bound = 10;
+        } else if (randomNumberCount < 500) {
+            bound = 50;
+        } else if (randomNumberCount < 1000) {
+            bound = 100;
+        } else {
+            bound = 150;
+        }
+        randomNumberCount++;
+        if (random.nextBoolean()) {
+            return specialNumbers.get(random.nextInt(specialNumbers.size()));
+        } else {
+            return random.nextInt(bound) - bound / 2;
+        }
+    }
+
+    public CheckAnswerResult checkAnswer(int problemId, String solution) {
+        String lang = "js";
+        List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
+        List<Testcase> testcaseList = testcaseService.findTestcasesByProblemId(problemId);
+
+        List<ExampleResult> exampleResult = new ArrayList<>();
+        for (Example example : exampleList) {
+            try {
+                JSONObject jsonBody = compilingService.createDataObject(solution, example.getInput());
+                String returnValue = compilingService.postData(jsonBody, lang);
+                String result = compilingService.handleResponse(returnValue);
+                if (result.equals(example.getOutput())) {
+                    exampleResult.add(new ExampleResult(example.getId(), "passed", null));
+                } else {
+                    exampleResult.add(new ExampleResult(example.getId(), "failed", "expected: " + example.getOutput() + " but got: " + result));
+                }
+            } catch (Exception e) {
+                throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 400);
+            }
+        }
+
+        List<TestcaseResult> testcaseResult = new ArrayList<>();
+        for (Testcase testcase : testcaseList) {
+            try {
+                JSONObject jsonBody = compilingService.createDataObject(solution, testcase.getInput());
+                String returnValue = compilingService.postData(jsonBody, lang);
+                String result = compilingService.handleResponse(returnValue);
+                if (result.equals(testcase.getOutput())) {
+                    testcaseResult.add(new TestcaseResult(testcase.getId(), "passed", null));
+                } else {
+                    testcaseResult.add(new TestcaseResult(testcase.getId(), "failed", null));
+                }
+            } catch (Exception e) {
+                throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 400);
+            }
+        }
+        CheckAnswerResult results = new CheckAnswerResult();
+        results.setExampleResults(exampleResult);
+        results.setTestcaseResults(testcaseResult);
+        return results;
     }
 }
