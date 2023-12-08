@@ -38,6 +38,7 @@ type Problem {
     exampleParameter: String
     example: [Example]
     testcase: [Testcase]
+    level: Int
     totalScore: Int
 }
 

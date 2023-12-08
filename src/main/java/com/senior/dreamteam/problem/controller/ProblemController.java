@@ -36,7 +36,7 @@ public class ProblemController {
     @SchemaMapping(typeName = "Mutation", value = "upsertProblem")
     public Problem upsertProblem(@Argument Integer id, @Argument String name, @Argument String description,
                                  @Argument String arrayTagId,
-                                 @Argument String solution, @Argument String exampleParameter, @Argument int totalScore
+                                 @Argument String solution, @Argument String exampleParameter, @Argument int level, @Argument int totalScore
     ) throws JSONException {
         Problem problem = new Problem();
         if (id != null) {
@@ -44,6 +44,7 @@ public class ProblemController {
             problem.setName(name);
             problem.setDescription(description);
             problem.setTotalScore(totalScore);
+            problem.setLevel(level);
             tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(problem, arrayTagId);
             return problemService.upsertProblem(problem);
         }
@@ -52,8 +53,8 @@ public class ProblemController {
         problem.setSolution(solution);
         problem.setExampleParameter(exampleParameter);
         problem.setTotalScore(totalScore);
+        problem.setLevel(level);
         Problem result = problemService.upsertProblem(problem);
-        System.out.println("be4 tag_pro");
         tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(result, arrayTagId);
         return result;
     }

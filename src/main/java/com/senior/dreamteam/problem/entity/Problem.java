@@ -40,6 +40,8 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Testcase> testcase;
 
+    int level;
+
     int totalScore;
 
 //    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
