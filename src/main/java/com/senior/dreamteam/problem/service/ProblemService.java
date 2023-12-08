@@ -52,9 +52,12 @@ public class ProblemService {
         if (problem.getId() != 0) {
             return problemRepository.save(problem);
         }
+        System.out.println("upsert services");
         String lang = "js";
         Boolean isExample = true;
+        System.out.println("b4 save");
         Problem problemSaved = problemRepository.save(problem);
+        System.out.println("af save");
         JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
         List<Object> exampleParameters = new ArrayList<>();
         for (int i = 0; i < exampleParametersArray.length(); i++) {
@@ -159,14 +162,17 @@ public class ProblemService {
     private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
         List<Testcase> testcases = new ArrayList<>();
         List<Example> examples = new ArrayList<>();
-
+        System.out.println("in exe test");
         for (Object params : testParams) {
             try {
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
-
+                System.out.println("b4 post to js node");
                 String returnValue = compilingService.postData(jsonBody, lang);
+                System.out.println("af post");
                 String result = compilingService.handleResponse(returnValue);
 
+                System.out.println("input: " + params.toString());
+                System.out.println("result: " + result.toString());
                 if (isExample) {
                     Example example = new Example();
                     example.setProblem(problem);
@@ -181,6 +187,7 @@ public class ProblemService {
                     testcases.add(testcase);
                 }
             } catch (Exception e) {
+                System.out.println("excep");
                 handleTestcaseError(problem, e);
                 return; // Exit the method if an error occurs
             }
@@ -196,7 +203,6 @@ public class ProblemService {
     }
 
     private void handleTestcaseError(Problem problem, Exception e) {
-        testcaseService.removeTestcasesByProblemId(problem.getId());
         problemRepository.deleteById(problem.getId());
         throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 404);
     }
