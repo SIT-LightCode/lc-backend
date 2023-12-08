@@ -272,9 +272,9 @@ public class ProblemService {
                 String returnValue = compilingService.postData(jsonBody, lang);
                 String result = compilingService.handleResponse(returnValue);
                 if (result.equals(example.getOutput())) {
-                    exampleResult.add(new ExampleResult(example.getId(), "passed", null));
+                    exampleResult.add(new ExampleResult(example.getId(), "passed", "with: " + example.getInput() + " and got: " + result));
                 } else {
-                    exampleResult.add(new ExampleResult(example.getId(), "failed", "expected: " + example.getOutput() + " but got: " + result));
+                    exampleResult.add(new ExampleResult(example.getId(), "failed", "with: " + example.getInput() + " but got: " + result));
                 }
             } catch (Exception e) {
                 throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 400);
