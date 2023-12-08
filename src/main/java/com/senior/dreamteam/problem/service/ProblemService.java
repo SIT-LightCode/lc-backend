@@ -55,7 +55,6 @@ public class ProblemService {
         String lang = "js";
         Boolean isExample = true;
         Problem problemSaved = problemRepository.save(problem);
-        System.out.println("here");
         JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
         List<Object> exampleParameters = new ArrayList<>();
         for (int i = 0; i < exampleParametersArray.length(); i++) {
@@ -158,13 +157,13 @@ public class ProblemService {
     }
 
     private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
-        System.out.println(problem.getId());
         List<Testcase> testcases = new ArrayList<>();
         List<Example> examples = new ArrayList<>();
 
         for (Object params : testParams) {
             try {
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
+
                 String returnValue = compilingService.postData(jsonBody, lang);
                 String result = compilingService.handleResponse(returnValue);
 
