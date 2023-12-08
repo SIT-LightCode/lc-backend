@@ -24,7 +24,7 @@ public class CompilingService {
     }
 
     public String postData(JSONObject data, String lang) {
-        String url = "/compiling/" + lang;
+        String url = "/compilers/" + lang;
         // Convert JSONObject to String and perform the POST request
         return webClient.post()
                 .uri(url)
