@@ -36,7 +36,7 @@ springdoc:
 
 webclient:
   base-url:
-    js-server: ${dogurlNaTusKingKib:http://localhost:8000}
+    js-server: ${nodex:http://localhost:8000}
 # incase port 8080 is already in use
 #server:
 #  port: 5000
