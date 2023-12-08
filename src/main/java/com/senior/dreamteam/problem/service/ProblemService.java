@@ -188,6 +188,7 @@ public class ProblemService {
                 }
             } catch (Exception e) {
                 System.out.println("excep");
+                System.out.println(e.toString());
                 handleTestcaseError(problem, e);
                 return; // Exit the method if an error occurs
             }
