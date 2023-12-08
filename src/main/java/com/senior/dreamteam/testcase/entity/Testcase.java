@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class Testcase {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    int id;
 
     String input;
     String output;

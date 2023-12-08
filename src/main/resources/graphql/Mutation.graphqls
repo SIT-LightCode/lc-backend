@@ -10,4 +10,6 @@ type Mutation {
 
     upsertProblem(id: Int, arrayTagId: String, name: String, description: String, solution: String, exampleParameter: String, level: Int, totalScore: Int): Problem
     removeProblem(id: Int!): String
+
+    checkAnswer(problemId: Int!, solution: String!): CheckAnswerResult!
 }

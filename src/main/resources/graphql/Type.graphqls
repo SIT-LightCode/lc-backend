@@ -55,3 +55,20 @@ type Testcase {
     output: String
     problem: [Problem]
 }
+
+type CheckAnswerResult {
+    exampleResults: [ExampleResult]
+    testcaseResults: [TestcaseResult]
+}
+
+type ExampleResult {
+    id: ID!
+    status: String!
+    message: String
+}
+
+type TestcaseResult {
+    id: ID!
+    status: String!
+    message: String
+}

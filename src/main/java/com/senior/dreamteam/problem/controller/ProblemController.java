@@ -1,6 +1,7 @@
 package com.senior.dreamteam.problem.controller;
 
 import com.senior.dreamteam.jointable.entities.tagproblem.service.TagProblemService;
+import com.senior.dreamteam.problem.entity.CheckAnswerResult;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.service.ProblemService;
 import com.senior.dreamteam.tag.service.TagService;
@@ -11,6 +12,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ProblemController {
@@ -64,4 +66,8 @@ public class ProblemController {
         return problemService.removeProblemById(id);
     }
 
+    @SchemaMapping(typeName = "Mutation", value = "checkAnswer")
+    public CheckAnswerResult checkAnswer(@Argument int problemId, @Argument String solution) {
+        return problemService.checkAnswer(problemId, solution);
+    }
 }
