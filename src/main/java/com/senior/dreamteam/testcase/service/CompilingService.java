@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,30 +34,35 @@ public class CompilingService {
                 .block(); // This will block until the value is available
     }
 
-    public JSONObject createDataObject(String code, String params) throws JSONException {
+    public JSONObject createDataObject(String code, List<Object> params) throws JSONException {
         JSONObject data = new JSONObject();
         data.put("code", code);
-        data.put("params", new JSONArray(params)); // Assuming params is a JSON array string
+        JSONArray paramsArray = new JSONArray(params);
+        data.put("params", paramsArray);
         return data;
     }
 
-    public String handleResponse(String jsonResponse) {
+    public List<String> handleResponse(String jsonResponse) {
         try {
-            // Parse the JSON response string
+            System.out.println(jsonResponse);
             JSONObject responseObject = new JSONObject(jsonResponse);
+            JSONArray messageArray = responseObject.getJSONArray("message");
+            List<String> results = new ArrayList<>();
 
-            // Get the "message" JSON object
-            JSONObject messageObject = responseObject.getJSONObject("message");
+            for (int i = 0; i < messageArray.length(); i++) {
+                JSONObject messageObject = messageArray.getJSONObject(i);
 
-            // Extract the values from the "message" object
-            boolean isError = messageObject.getBoolean("isError");
-            if (isError) {
-                String errorMessage = messageObject.isNull("errorMessage") ? null : messageObject.getString("errorMessage");
-                throw new DemoGraphqlException("Got error from response: " + errorMessage, 404);
+                // Extract the values from each "message" object
+                boolean isError = messageObject.getBoolean("isError");
+                if (isError) {
+                    String errorMessage = messageObject.isNull("errorMessage") ? null : messageObject.getString("errorMessage");
+                    throw new DemoGraphqlException("Got error from response: " + errorMessage);
+                }
+                results.add(messageObject.getString("result"));
             }
-            return messageObject.getString("result");
+            return results;
         } catch (JSONException e) {
-            throw new DemoGraphqlException("Error parsing JSON response: " + e.getMessage(), 500);
+            throw new DemoGraphqlException("Error parsing JSON response: " + e.getMessage());
         }
     }
 }

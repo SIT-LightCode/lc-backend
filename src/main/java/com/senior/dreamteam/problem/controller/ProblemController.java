@@ -40,7 +40,7 @@ public class ProblemController {
                                  @Argument String arrayTagId,
                                  @Argument String solution, @Argument String exampleParameter, @Argument int level, @Argument int totalScore
     ) throws JSONException {
-        System.out.println("upsertProb");
+
         Problem problem = new Problem();
         if (id != null) {
             problem = problemService.findAllById(id).get();

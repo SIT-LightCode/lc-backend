@@ -13,7 +13,6 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        System.out.println(baseUrl);
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .build();

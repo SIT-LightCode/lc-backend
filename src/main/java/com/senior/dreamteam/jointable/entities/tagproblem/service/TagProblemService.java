@@ -59,7 +59,7 @@ public class TagProblemService {
             tagProblemRepository.saveAll(tagProblems); // Save all entities at once
             return true;
         } catch (Exception e) {
-            throw new DemoGraphqlException("An error occured: " + e.getMessage(), 400);
+            throw new DemoGraphqlException("An error occured: " + e.getMessage());
         }
     }
 

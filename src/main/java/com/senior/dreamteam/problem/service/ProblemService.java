@@ -52,12 +52,9 @@ public class ProblemService {
         if (problem.getId() != 0) {
             return problemRepository.save(problem);
         }
-        System.out.println("upsert services");
         String lang = "js";
         Boolean isExample = true;
-        System.out.println("b4 save");
         Problem problemSaved = problemRepository.save(problem);
-        System.out.println("af save");
         JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
         List<Object> exampleParameters = new ArrayList<>();
         for (int i = 0; i < exampleParametersArray.length(); i++) {
@@ -83,7 +80,7 @@ public class ProblemService {
                 return "Problem not found with ID: " + id;
             }
         } catch (Exception e) {
-            return "An error occurred: " + e.getMessage();
+            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
         }
     }
 
@@ -93,6 +90,7 @@ public class ProblemService {
             JSONObject newParams = generateSingleSetOfParams(exampleParameters);
             generatedParams.add(convertParamsToList(newParams));
         }
+        randomNumberCount = 0;
         return generatedParams;
     }
 
@@ -104,7 +102,6 @@ public class ProblemService {
             Object param = new JSONTokener(exampleParameters.getString(key)).nextValue();
             newParams.put(key, generateNewValue(param));
         }
-        randomNumberCount = 0;
         return newParams;
     }
 
@@ -160,41 +157,34 @@ public class ProblemService {
     }
 
     private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
-        List<Testcase> testcases = new ArrayList<>();
-        List<Example> examples = new ArrayList<>();
-        System.out.println("in exe test");
-        for (Object params : testParams) {
-            try {
-                JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), params.toString());
-                System.out.println("b4 post to js node");
-                String returnValue = compilingService.postData(jsonBody, lang);
-                System.out.println("af post");
-                String result = compilingService.handleResponse(returnValue);
-
-                System.out.println("input: " + params.toString());
-                System.out.println("result: " + result.toString());
+        List<Testcase> testcases = new ArrayList<Testcase>();
+        List<Example> examples = new ArrayList<Example>();
+        try {
+            // modification here: send all params at once
+            JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), testParams);
+            String returnValue = compilingService.postData(jsonBody, lang);
+            List<String> results = compilingService.handleResponse(returnValue); // assuming handleResponse returns a list of results corresponding to testParams
+            System.out.println(returnValue);
+            for (int i = 0; i < testParams.size(); i++) {
                 if (isExample) {
                     Example example = new Example();
                     example.setProblem(problem);
-                    example.setInput(params.toString());
-                    example.setOutput(result);
+                    example.setInput(testParams.get(i).toString());
+                    example.setOutput(results.get(i));
                     examples.add(example);
                 } else {
                     Testcase testcase = new Testcase();
                     testcase.setProblem(problem);
-                    testcase.setInput(params.toString());
-                    testcase.setOutput(result);
+                    testcase.setInput(testParams.get(i).toString());
+                    testcase.setOutput(results.get(i));
                     testcases.add(testcase);
                 }
-            } catch (Exception e) {
-                System.out.println("excep");
-                System.out.println(e.toString());
-                handleTestcaseError(problem, e);
-                return; // Exit the method if an error occurs
             }
+        } catch (Exception e) {
+            handleTestcaseError(problem, e);
+            return; // exit the method if an error occurs
         }
-
-        // Save all test cases and examples at once
+        // save all test cases and examples at once
         if (!examples.isEmpty()) {
             exampleService.saveAll(examples);
         }
@@ -205,7 +195,7 @@ public class ProblemService {
 
     private void handleTestcaseError(Problem problem, Exception e) {
         problemRepository.deleteById(problem.getId());
-        throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 404);
+        throw new DemoGraphqlException("An error occurred: " + e.getMessage());
     }
 
     private Object generateNewValue(Object param) throws JSONException {
@@ -218,7 +208,6 @@ public class ProblemService {
             }
             return newArray.toString();
         } else if (param instanceof JSONObject jsonObject) {
-            // It's an object
             JSONObject newObject = new JSONObject();
             Iterator<String> keys = jsonObject.keys();
             while (keys.hasNext()) {
@@ -228,13 +217,10 @@ public class ProblemService {
             }
             return newObject.toString();
         } else if (param instanceof Number) {
-            // Generate a new random number
             return generateRandomNumber();
         } else if (param instanceof String) {
-            // Generate a new random string
             return UUID.randomUUID().toString();
         } else {
-            // Default to string if type is unknown
             return param.toString();
         }
     }
@@ -266,35 +252,44 @@ public class ProblemService {
         List<Testcase> testcaseList = testcaseService.findTestcasesByProblemId(problemId);
 
         List<ExampleResult> exampleResult = new ArrayList<>();
-        for (Example example : exampleList) {
-            try {
-                JSONObject jsonBody = compilingService.createDataObject(solution, example.getInput());
-                String returnValue = compilingService.postData(jsonBody, lang);
-                String result = compilingService.handleResponse(returnValue);
-                if (result.equals(example.getOutput())) {
-                    exampleResult.add(new ExampleResult(example.getId(), "passed", "with: " + example.getInput() + " and got: " + result));
+        try {
+            JSONObject jsonBody = compilingService.createDataObject(solution, Collections.singletonList(exampleList));
+            String returnValue = compilingService.postData(jsonBody, lang);
+            List<String> results = compilingService.handleResponse(returnValue);
+
+            // Loop index to keep track of iteration count
+            int index = 0;
+
+            for (String result : results) {
+                if (result.equals(exampleList.get(index).getOutput())) {
+                    exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "passed", "with: " + exampleList.get(index).getInput() + " and got: " + result));
                 } else {
-                    exampleResult.add(new ExampleResult(example.getId(), "failed", "with: " + example.getInput() + " but got: " + result));
+                    exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "failed", "with: " + exampleList.get(index).getInput() + " but got: " + result));
                 }
-            } catch (Exception e) {
-                throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 400);
+                index++;  // Increment the index at the end of each loop iteration
             }
+
+        } catch (Exception e) {
+            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
         }
 
         List<TestcaseResult> testcaseResult = new ArrayList<>();
-        for (Testcase testcase : testcaseList) {
-            try {
-                JSONObject jsonBody = compilingService.createDataObject(solution, testcase.getInput());
-                String returnValue = compilingService.postData(jsonBody, lang);
-                String result = compilingService.handleResponse(returnValue);
-                if (result.equals(testcase.getOutput())) {
-                    testcaseResult.add(new TestcaseResult(testcase.getId(), "passed", null));
+        try {
+            JSONObject jsonBody = compilingService.createDataObject(solution, Collections.singletonList(testcaseList));
+            String returnValue = compilingService.postData(jsonBody, lang);
+            List<String> results = compilingService.handleResponse(returnValue);
+
+            int index = 0;
+            for (String result : results) {
+                if (result.equals(testcaseList.get(index).getOutput())) {
+                    testcaseResult.add(new TestcaseResult(testcaseList.get(index).getId(), "passed", null));
                 } else {
-                    testcaseResult.add(new TestcaseResult(testcase.getId(), "failed", null));
+                    testcaseResult.add(new TestcaseResult(testcaseList.get(index).getId(), "failed", null));
                 }
-            } catch (Exception e) {
-                throw new DemoGraphqlException("An error occurred: " + e.getMessage(), 400);
+                index++;
             }
+        } catch (Exception e) {
+            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
         }
         CheckAnswerResult results = new CheckAnswerResult();
         results.setExampleResults(exampleResult);
