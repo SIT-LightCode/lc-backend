@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProblemService {
@@ -48,6 +49,7 @@ public class ProblemService {
         return problemRepository.findProblemById(id);
     }
 
+    @Transactional
     public Problem upsertProblem(Problem problem) throws JSONException {
         if (problem.getId() != 0) {
             return problemRepository.save(problem);
@@ -156,32 +158,37 @@ public class ProblemService {
         return map;
     }
 
-    private void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
+    @Transactional
+    public void executeAndSaveTest(Problem problem, List<Object> testParams, String lang, Boolean isExample) {
         List<Testcase> testcases = new ArrayList<Testcase>();
         List<Example> examples = new ArrayList<Example>();
         try {
-            // modification here: send all params at once
-            JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), testParams);
-            String returnValue = compilingService.postData(jsonBody, lang);
-            List<String> results = compilingService.handleResponse(returnValue); // assuming handleResponse returns a list of results corresponding to testParams
-            for (int i = 0; i < testParams.size(); i++) {
-                if (isExample) {
-                    Example example = new Example();
-                    example.setProblem(problem);
-                    example.setInput(testParams.get(i).toString());
-                    example.setOutput(results.get(i));
-                    examples.add(example);
-                } else {
-                    Testcase testcase = new Testcase();
-                    testcase.setProblem(problem);
-                    testcase.setInput(testParams.get(i).toString());
-                    testcase.setOutput(results.get(i));
-                    testcases.add(testcase);
+            int batchSize = 300;
+            for (int i = 0; i < testParams.size(); i += batchSize) {
+                int endIndex = Math.min(testParams.size(), i + batchSize);
+                List<Object> batchParams = testParams.subList(i, endIndex);
+                JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), batchParams);
+                String returnValue = compilingService.postData(jsonBody, lang);
+                List<String> results = compilingService.handleResponse(returnValue);
+                for (int j = 0; j < batchParams.size(); j++) {
+                    if (isExample) {
+                        Example example = new Example();
+                        example.setProblem(problem);
+                        example.setInput(testParams.get(i).toString());
+                        example.setOutput(results.get(i));
+                        examples.add(example);
+                    } else {
+                        Testcase testcase = new Testcase();
+                        testcase.setProblem(problem);
+                        testcase.setInput(batchParams.get(j).toString());
+                        testcase.setOutput(results.get(j));
+                        testcases.add(testcase);
+                    }
                 }
             }
         } catch (Exception e) {
             handleTestcaseError(problem, e);
-            return; // exit the method if an error occurs
+            return;
         }
         // save all test cases and examples at once
         if (!examples.isEmpty()) {
@@ -192,8 +199,13 @@ public class ProblemService {
         }
     }
 
-    private void handleTestcaseError(Problem problem, Exception e) {
-        problemRepository.deleteById(problem.getId());
+    @Transactional
+    public void handleTestcaseError(Problem problem, Exception e) {
+        try {
+            problemRepository.deleteById(problem.getId());
+        } catch (Exception ex) {
+            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
+        }
         throw new DemoGraphqlException("An error occurred: " + e.getMessage());
     }
 
