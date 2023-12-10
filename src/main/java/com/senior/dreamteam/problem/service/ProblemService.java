@@ -164,7 +164,6 @@ public class ProblemService {
             JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), testParams);
             String returnValue = compilingService.postData(jsonBody, lang);
             List<String> results = compilingService.handleResponse(returnValue); // assuming handleResponse returns a list of results corresponding to testParams
-            System.out.println(returnValue);
             for (int i = 0; i < testParams.size(); i++) {
                 if (isExample) {
                     Example example = new Example();

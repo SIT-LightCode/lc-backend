@@ -44,7 +44,6 @@ public class CompilingService {
 
     public List<String> handleResponse(String jsonResponse) {
         try {
-            System.out.println(jsonResponse);
             JSONObject responseObject = new JSONObject(jsonResponse);
             JSONArray messageArray = responseObject.getJSONArray("message");
             List<String> results = new ArrayList<>();
