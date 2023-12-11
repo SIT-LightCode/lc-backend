@@ -15,3 +15,11 @@ jobs:
         tags: "automated"
         type: "dev"
         ghcr_pat: ${{ secrets.GHCR_PAT }}
+  deploy-dev:
+    runs-on: self-hosted
+    needs: [build-back-image]
+    steps:
+    - name: Deploy on develop server
+      uses: SIT-LightCode/LC-Deployment/actions/auto-deployment-dev@main
+      with:
+        restart: "no"
