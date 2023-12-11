@@ -1,5 +1,4 @@
-package com.senior.dreamteam.problem.entity;
-
+package com.senior.dreamteam.other.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +9,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ExampleResult {
+public class TestcaseResult {
     private int id;
     private String status;
     private String message;
-
 }

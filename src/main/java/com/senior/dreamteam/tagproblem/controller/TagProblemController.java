@@ -1,10 +1,7 @@
-package com.senior.dreamteam.jointable.entities.tagproblem.controller;
+package com.senior.dreamteam.tagproblem.controller;
 
-import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
-import com.senior.dreamteam.jointable.entities.tagproblem.service.TagProblemService;
-import com.senior.dreamteam.lesson.entity.Lesson;
-import com.senior.dreamteam.lesson.entity.LessonInput;
-import com.senior.dreamteam.lesson.service.LessonService;
+import com.senior.dreamteam.tagproblem.entity.TagProblem;
+import com.senior.dreamteam.tagproblem.service.TagProblemService;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.service.ProblemService;
 import com.senior.dreamteam.tag.entity.Tag;
@@ -13,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
-import java.util.Collections;
 import java.util.List;
 
 @Controller

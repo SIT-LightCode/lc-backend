@@ -1,11 +1,10 @@
-package com.senior.dreamteam.jointable.entities.tagproblem.service;
+package com.senior.dreamteam.tagproblem.service;
 
 import com.senior.dreamteam.exception.DemoGraphqlException;
-import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
-import com.senior.dreamteam.jointable.entities.tagproblem.repository.TagProblemRepository;
+import com.senior.dreamteam.tagproblem.entity.TagProblem;
+import com.senior.dreamteam.tagproblem.repository.TagProblemRepository;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.tag.entity.Tag;
-import com.senior.dreamteam.tag.repository.TagRepository;
 import com.senior.dreamteam.tag.service.TagService;
 import org.json.JSONArray;
 import org.json.JSONException;

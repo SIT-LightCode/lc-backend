@@ -1,10 +1,11 @@
 package com.senior.dreamteam.problem.controller;
 
-import com.senior.dreamteam.jointable.entities.tagproblem.service.TagProblemService;
-import com.senior.dreamteam.problem.entity.CheckAnswerResult;
+import com.senior.dreamteam.tagproblem.service.TagProblemService;
+import com.senior.dreamteam.other.entities.CheckAnswerResult;
 import com.senior.dreamteam.problem.entity.Problem;
 import com.senior.dreamteam.problem.service.ProblemService;
 import com.senior.dreamteam.tag.service.TagService;
+import com.senior.dreamteam.validation.GenericValidation;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -12,7 +13,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class ProblemController {
@@ -24,6 +24,8 @@ public class ProblemController {
 
     @Autowired
     TagProblemService tagProblemService;
+
+    GenericValidation genericValidation = new GenericValidation();
 
     @SchemaMapping(typeName = "Query", value = "getProblem")
     public List<Problem> findAll() {
@@ -40,7 +42,8 @@ public class ProblemController {
                                  @Argument String arrayTagId,
                                  @Argument String solution, @Argument String exampleParameter, @Argument int level, @Argument int totalScore
     ) throws JSONException {
-
+        genericValidation.validateParameter(level, 1, 5);
+        genericValidation.validateParameter(totalScore, 1, 100);
         Problem problem = new Problem();
         if (id != null) {
             problem = problemService.findAllById(id).get();

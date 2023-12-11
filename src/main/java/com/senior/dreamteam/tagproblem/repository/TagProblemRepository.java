@@ -1,7 +1,7 @@
-package com.senior.dreamteam.jointable.entities.tagproblem.repository;
+package com.senior.dreamteam.tagproblem.repository;
 
 
-import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
+import com.senior.dreamteam.tagproblem.entity.TagProblem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

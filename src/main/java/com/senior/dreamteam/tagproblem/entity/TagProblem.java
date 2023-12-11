@@ -1,4 +1,4 @@
-package com.senior.dreamteam.jointable.entities.tagproblem.entity;
+package com.senior.dreamteam.tagproblem.entity;
 
 import com.senior.dreamteam.lesson.entity.Lesson;
 import com.senior.dreamteam.problem.entity.Problem;

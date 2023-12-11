@@ -1,6 +1,6 @@
 package com.senior.dreamteam.tag.entity;
 
-import com.senior.dreamteam.jointable.entities.tagproblem.entity.TagProblem;
+import com.senior.dreamteam.tagproblem.entity.TagProblem;
 import com.senior.dreamteam.lesson.entity.Lesson;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

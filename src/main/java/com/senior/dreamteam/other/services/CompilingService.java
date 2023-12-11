@@ -1,4 +1,4 @@
-package com.senior.dreamteam.testcase.service;
+package com.senior.dreamteam.other.services;
 
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import org.json.JSONException;

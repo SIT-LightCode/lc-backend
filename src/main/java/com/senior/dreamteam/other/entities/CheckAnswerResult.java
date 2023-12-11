@@ -1,4 +1,4 @@
-package com.senior.dreamteam.problem.entity;
+package com.senior.dreamteam.other.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
