@@ -1,17 +1,8 @@
 name: 'Build push back image '
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: tag name
-      type:
-        description: 'type of image is stable or dev'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - stable
-          - dev
+  push:
+    branches:
+      - main
 
 jobs:
   build-back-image:
@@ -21,6 +12,6 @@ jobs:
       uses: SIT-LightCode/LC-Deployment/actions/build-push-back@main
       with:
         image: "back-end"
-        tags: ${{ inputs.tag }}
-        type: ${{ inputs.type }}
+        tags: "automated"
+        type: "dev"
         ghcr_pat: ${{ secrets.GHCR_PAT }}
