@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -257,6 +258,7 @@ public class ProblemService {
         }
     }
 
+    @Transactional
     public CheckAnswerResult checkAnswer(int problemId, String solution) {
         String lang = "js";
         List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
@@ -264,7 +266,11 @@ public class ProblemService {
 
         List<ExampleResult> exampleResult = new ArrayList<>();
         try {
-            JSONObject jsonBody = compilingService.createDataObject(solution, Collections.singletonList(exampleList));
+            List<Object> paramList = exampleList.stream()
+                    .map(example -> example.getInput().replaceAll("\\[|\\]|\\s", "").split(","))
+                    .collect(Collectors.toList());
+
+            JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
             String returnValue = compilingService.postData(jsonBody, lang);
             List<String> results = compilingService.handleResponse(returnValue);
 
@@ -286,7 +292,10 @@ public class ProblemService {
 
         List<TestcaseResult> testcaseResult = new ArrayList<>();
         try {
-            JSONObject jsonBody = compilingService.createDataObject(solution, Collections.singletonList(testcaseList));
+            List<Object> paramList = testcaseList.stream()
+                    .map(example -> example.getInput().replaceAll("\\[|\\]|\\s", "").split(","))
+                    .collect(Collectors.toList());
+            JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
             String returnValue = compilingService.postData(jsonBody, lang);
             List<String> results = compilingService.handleResponse(returnValue);
 
