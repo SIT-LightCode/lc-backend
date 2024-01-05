@@ -37,7 +37,21 @@ public class CompilingService {
     public JSONObject createDataObject(String code, List<Object> params) throws JSONException {
         JSONObject data = new JSONObject();
         data.put("code", code);
-        JSONArray paramsArray = new JSONArray(params);
+        JSONArray paramsArray = new JSONArray();
+
+        for(Object obj : params) {
+            String strObj = String.valueOf(obj);
+            if(strObj.startsWith("{") && strObj.endsWith("}")) {
+                paramsArray.put(new JSONObject(strObj));
+            }
+            else if(strObj.startsWith("[") && strObj.endsWith("]")) {
+                paramsArray.put(new JSONArray(strObj));
+            }
+            else {
+                paramsArray.put(obj);
+            }
+        }
+
         data.put("params", paramsArray);
         return data;
     }

@@ -108,24 +108,25 @@ public class ProblemService {
         return newParams;
     }
 
-    private List<Object> convertParamsToList(JSONObject newParams) throws JSONException {
+    private Object convertParamsToList(JSONObject newParams) throws JSONException {
         List<Object> paramsList = new ArrayList<>();
         Iterator<String> keysIterator = newParams.keys();
         while (keysIterator.hasNext()) {
             String key = keysIterator.next();
             Object value = newParams.get(key);
-            paramsList.add(parseValue(value));
+            paramsList.add(value);
+
         }
-        return paramsList;
+        return paramsList.get(0);
     }
 
-    private Object parseValue(Object value) throws JSONException {
-        if (value instanceof String && ((String) value).startsWith("[")) {
-            JSONArray jsonArray = new JSONArray((String) value);
-            return jsonArrayToList(jsonArray);
-        }
-        return value;
-    }
+//    private Object parseValue(Object value) throws JSONException {
+//        if (value instanceof String && ((String) value).startsWith("[")) {
+//            JSONArray jsonArray = new JSONArray((String) value);
+//            return jsonArrayToList(jsonArray);
+//        }
+//        return value;
+//    }
 
     private List<Object> jsonArrayToList(JSONArray jsonArray) throws JSONException {
         List<Object> list = new ArrayList<>();
@@ -175,8 +176,8 @@ public class ProblemService {
                     if (isExample) {
                         Example example = new Example();
                         example.setProblem(problem);
-                        example.setInput(testParams.get(i+j).toString());
-                        example.setOutput(results.get(i+j));
+                        example.setInput(testParams.get(i + j).toString());
+                        example.setOutput(results.get(i + j));
                         examples.add(example);
                     } else {
                         Testcase testcase = new Testcase();
@@ -263,56 +264,70 @@ public class ProblemService {
         String lang = "js";
         List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
         List<Testcase> testcaseList = testcaseService.findTestcasesByProblemId(problemId);
+
         List<ExampleResult> exampleResult = new ArrayList<>();
-        try {
-            List<Object> paramList = exampleList.stream()
-                    .map(example -> example.getInput().replaceAll("\\[|\\]", "").split(","))
-                    .collect(Collectors.toList());
-            JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
-            String returnValue = compilingService.postData(jsonBody, lang);
-            List<String> results = compilingService.handleResponse(returnValue);
-
-            // Loop index to keep track of iteration count
-            int index = 0;
-            System.out.println("here");
-            for (String result : results) {
-                if (result.equals(exampleList.get(index).getOutput())) {
-                    exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "passed", "with: " + exampleList.get(index).getInput() + " and got: " + result));
-                } else {
-                    System.out.println("====");
-                    System.out.println("expected: " + exampleList.get(index).getOutput());
-                    System.out.println("result: " + result);
-                    System.out.println(exampleList.get(index).getOutput()); //{"key": 123} {"key": 123}
-                    exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "failed", "with: " + exampleList.get(index).getInput() + " but got: " + result));
-                }
-                index++;  // Increment the index at the end of each loop iteration
-            }
-
-        } catch (Exception e) {
-            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
-        }
-
         List<TestcaseResult> testcaseResult = new ArrayList<>();
-        try {
-            List<Object> paramList = testcaseList.stream()
-                    .map(example -> example.getInput().replaceAll("\\[|\\]|\\s", "").split(","))
-                    .collect(Collectors.toList());
-            JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
-            String returnValue = compilingService.postData(jsonBody, lang);
-            List<String> results = compilingService.handleResponse(returnValue);
 
-            int index = 0;
-            for (String result : results) {
-                if (result.equals(testcaseList.get(index).getOutput())) {
-                    testcaseResult.add(new TestcaseResult(testcaseList.get(index).getId(), "passed", null));
-                } else {
-                    testcaseResult.add(new TestcaseResult(testcaseList.get(index).getId(), "failed", null));
+        // Define batch size
+        int batchSize = 300;
+
+        // Execute in batches
+        for (int i = 0; i < exampleList.size(); i += batchSize) {
+            int endIndex = Math.min(exampleList.size(), i + batchSize);
+
+            // Create batches for processing
+            List<Example> exampleBatch = exampleList.subList(i, endIndex);
+
+            try {
+                List<Object> paramList = exampleBatch.stream()
+                        .map(example -> example.getInput())
+                        .collect(Collectors.toList());
+                JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
+                String returnValue = compilingService.postData(jsonBody, lang);
+                List<String> results = compilingService.handleResponse(returnValue);
+
+                int index = 0;
+                for (String result : results) {
+                    if (result.equals(exampleBatch.get(index).getOutput())) {
+                        exampleResult.add(new ExampleResult(exampleBatch.get(index).getId(), "passed", "with: " + exampleBatch.get(index).getInput() + " and got: " + result));
+                    } else {
+                        exampleResult.add(new ExampleResult(exampleBatch.get(index).getId(), "failed", "with: " + exampleBatch.get(index).getInput() + " but got: " + result));
+                    }
+                    index++;
                 }
-                index++;
+            } catch (Exception e) {
+                throw new DemoGraphqlException("An error occurred: " + e.getMessage());
             }
-        } catch (Exception e) {
-            throw new DemoGraphqlException("An error occurred: " + e.getMessage());
         }
+        // Execute Testcase list in batches
+        for (int i = 0; i < testcaseList.size(); i += batchSize) {
+            int endIndex = Math.min(testcaseList.size(), i + batchSize);
+
+            // Create batches for processing
+            List<Testcase> testcaseBatch = testcaseList.subList(i, endIndex);
+
+            try {
+                List<Object> paramList = testcaseBatch.stream()
+                        .map(testcase -> testcase.getInput()).collect(Collectors.toList());
+                JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
+                String returnValue = compilingService.postData(jsonBody, lang);
+                List<String> results = compilingService.handleResponse(returnValue);
+
+                int index = 0;
+                for (String result : results) {
+                    if (result.equals(testcaseBatch.get(index).getOutput())) {
+                        testcaseResult.add(new TestcaseResult(testcaseBatch.get(index).getId(), "passed", null));
+                    } else {
+                        testcaseResult.add(new TestcaseResult(testcaseBatch.get(index).getId(), "failed", null));
+                    }
+                    index++;
+                }
+
+            } catch (Exception e) {
+                throw new DemoGraphqlException("An error occurred: " + e.getMessage());
+            }
+        }
+
         CheckAnswerResult results = new CheckAnswerResult();
         results.setExampleResults(exampleResult);
         results.setTestcaseResults(testcaseResult);
