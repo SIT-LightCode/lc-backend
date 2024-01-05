@@ -175,8 +175,8 @@ public class ProblemService {
                     if (isExample) {
                         Example example = new Example();
                         example.setProblem(problem);
-                        example.setInput(testParams.get(i).toString());
-                        example.setOutput(results.get(i));
+                        example.setInput(testParams.get(i+j).toString());
+                        example.setOutput(results.get(i+j));
                         examples.add(example);
                     } else {
                         Testcase testcase = new Testcase();
@@ -263,24 +263,26 @@ public class ProblemService {
         String lang = "js";
         List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
         List<Testcase> testcaseList = testcaseService.findTestcasesByProblemId(problemId);
-
         List<ExampleResult> exampleResult = new ArrayList<>();
         try {
             List<Object> paramList = exampleList.stream()
-                    .map(example -> example.getInput().replaceAll("\\[|\\]|\\s", "").split(","))
+                    .map(example -> example.getInput().replaceAll("\\[|\\]", "").split(","))
                     .collect(Collectors.toList());
-
             JSONObject jsonBody = compilingService.createDataObject(solution, paramList);
             String returnValue = compilingService.postData(jsonBody, lang);
             List<String> results = compilingService.handleResponse(returnValue);
 
             // Loop index to keep track of iteration count
             int index = 0;
-
+            System.out.println("here");
             for (String result : results) {
                 if (result.equals(exampleList.get(index).getOutput())) {
                     exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "passed", "with: " + exampleList.get(index).getInput() + " and got: " + result));
                 } else {
+                    System.out.println("====");
+                    System.out.println("expected: " + exampleList.get(index).getOutput());
+                    System.out.println("result: " + result);
+                    System.out.println(exampleList.get(index).getOutput()); //{"key": 123} {"key": 123}
                     exampleResult.add(new ExampleResult(exampleList.get(index).getId(), "failed", "with: " + exampleList.get(index).getInput() + " but got: " + result));
                 }
                 index++;  // Increment the index at the end of each loop iteration
