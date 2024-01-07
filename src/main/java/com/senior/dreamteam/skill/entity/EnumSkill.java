@@ -12,16 +12,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skill {
+public class EnumSkill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @OneToOne
-    EnumSkill enumSkill;
+    String skillName;
 
-    Boolean isPassed;
-
-    @ManyToOne
-    User user;
+//    @OneToOne
+//    Skill skill;
 }
