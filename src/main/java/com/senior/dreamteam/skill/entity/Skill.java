@@ -17,10 +17,8 @@ public class Skill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @OneToOne
-    EnumSkill enumSkill;
-
-    Boolean isPassed;
+    boolean topic1;
+    boolean topic2;
 
     @ManyToOne
     User user;

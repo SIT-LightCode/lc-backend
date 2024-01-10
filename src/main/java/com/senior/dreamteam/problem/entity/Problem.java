@@ -3,7 +3,6 @@ package com.senior.dreamteam.problem.entity;
 import com.senior.dreamteam.example.entity.Example;
 import com.senior.dreamteam.tagproblem.entity.TagProblem;
 import com.senior.dreamteam.testcase.entity.Testcase;
-import com.senior.dreamteam.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +47,6 @@ public class Problem {
 //    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
 //    List<Submission> submission;
 
-    @ManyToOne
-    User user;
+//    @ManyToOne
+//    User user;
 }

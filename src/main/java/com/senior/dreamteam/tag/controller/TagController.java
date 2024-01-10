@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.List;
 
 @Controller
+@CrossOrigin(origins = "http://localhost:3000")
 public class TagController {
     @Autowired
     TagService tagService;
@@ -37,4 +38,9 @@ public class TagController {
     public String removeLesson(@Argument int tagId) {
         return tagService.removeTagById(tagId);
     }
+
+//    @QueryMapping
+//    public Book findById(@Argument Integer id) {
+//        return bookRepository.findById(id);
+//    }
 }

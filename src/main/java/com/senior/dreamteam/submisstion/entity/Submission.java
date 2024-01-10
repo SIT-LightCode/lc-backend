@@ -18,8 +18,8 @@ public class Submission {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
-//    @ManyToOne
-//    User user;
+    @ManyToOne
+    User user;
 
 //    @ManyToOne
 //    Problem problem;

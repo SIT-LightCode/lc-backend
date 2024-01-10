@@ -25,16 +25,16 @@ public class User {
     String username;
     String password;
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    List<Submission> submission;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Submission> submission;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Problem> problem;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    List<Problem> problemCreatedList;
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    List<Problem> likedProblem;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Skill> skill;
 }
 
