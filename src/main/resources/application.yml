@@ -36,8 +36,8 @@ springdoc:
 
 webclient:
   base-url:
-    js-server: http://${NODEX:lightcodedev.sit.kmutt.ac.th}:8000
-#    js-server: http://${NODEX:localhost}:8000
+#    js-server: http://${NODEX:lightcodedev.sit.kmutt.ac.th}:8000
+    js-server: http://${NODEX:localhost}:8000
 # incase port 8080 is already in use
 #server:
 #  port: 5000
