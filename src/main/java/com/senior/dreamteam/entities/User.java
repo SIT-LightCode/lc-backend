@@ -16,7 +16,7 @@ public class User {
     Long id;
     Authorities authorities;
     String name;
-    String username;
+    String email;
     String password;
 
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
