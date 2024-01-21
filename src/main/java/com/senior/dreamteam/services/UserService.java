@@ -1,7 +1,7 @@
 package com.senior.dreamteam.services;
 
-import com.senior.dreamteam.configs.GraphqlExceptionConfig;
 import com.senior.dreamteam.entities.Authorities;
+import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
@@ -9,12 +9,9 @@ import de.mkammerer.argon2.Argon2Factory;
 import com.senior.dreamteam.repositories.TagProblemRepository;
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.repositories.UserRepository;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +32,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found"));
     }
 
     public String argon2Hashing(String stringToHash) {
@@ -50,10 +47,12 @@ public class UserService {
         }
 
         User user = new User();
-        if (Authorities.ADMIN.name().equalsIgnoreCase(role)) {
-            user.setAuthorities(Authorities.ADMIN);
+        if (Roles.ADMIN.name().equalsIgnoreCase(role)) {
+            user.setAuthorities(List.of(Authorities.builder()
+                    .name(Roles.ADMIN)
+                    .build()));
         } else {
-            user.setAuthorities(Authorities.USER);
+            user.setAuthorities(List.of(getAuthorityByName(Roles.ADMIN)));
         }
         user.setName(name);
         user.setEmail(email);
@@ -66,10 +65,10 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findUserByEmail(email);
         User user = optionalUser.orElseThrow(() -> new DemoGraphqlException("This user not found"));
 
-        if (Authorities.ADMIN.name().equalsIgnoreCase(role)) {
-            user.setAuthorities(Authorities.ADMIN);
+        if ("admin".equalsIgnoreCase(role)) {
+            user.setAuthorities(List.of(getAuthorityByName(Roles.ADMIN)));
         } else {
-            user.setAuthorities(Authorities.USER);
+            user.setAuthorities(List.of(getAuthorityByName(Roles.USER)));
         }
         user.setName(name);
         user.setEmail(email);
@@ -77,6 +76,11 @@ public class UserService {
         userRepository.save(user);
         return user;
     }
+
+    public Authorities getAuthorityByName(Roles name) {
+        return userRepository.findByName(name);
+    }
+
 
 
     public String removeUserById(int id) {

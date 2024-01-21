@@ -11,4 +11,5 @@ type Query {
     getProblem: [Problem]
     getProblemById(id: ID!): [Problem]
 
+    getUser: [User]
 }

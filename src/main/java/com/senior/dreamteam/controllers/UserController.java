@@ -43,8 +43,8 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeUser")
-    public String removeUser(@Argument int userId) {
-        return userService.removeUserById(userId);
+    public String removeUser(@Argument int id) {
+        return userService.removeUserById(id);
     }
 
 }

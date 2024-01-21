@@ -1,6 +1,8 @@
 package com.senior.dreamteam.repositories;
 
 
+import com.senior.dreamteam.entities.Authorities;
+import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findAll();
 
     Optional<User> findUserByEmail(String email);
+    Authorities findByName(Roles name);
+
+
 }

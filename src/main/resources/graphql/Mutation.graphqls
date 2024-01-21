@@ -12,4 +12,8 @@ type Mutation {
     removeProblem(id: Int!): String
 
     checkAnswer(problemId: Int!, solution: String!): CheckAnswerResult!
+
+    upsertUser(id: Int, role: String, name: String, email: String, password: String): User
+    removeUser(id: Int!): String
+
 }

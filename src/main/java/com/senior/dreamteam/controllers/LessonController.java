@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Controller
-@CrossOrigin(origins = "http://localhost:3000")
 public class LessonController {
     @Autowired
     LessonService lessonService;
