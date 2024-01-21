@@ -1,4 +1,4 @@
-package com.senior.dreamteam.configs;
+package com.senior.dreamteam.authentication;
 
 import com.senior.dreamteam.authentication.JwtEntryPoint;
 import com.senior.dreamteam.authentication.JwtFilter;
@@ -43,6 +43,7 @@ public class SecurityConfig {
     final UserService userService;
 
     private static final String[] FREE_AREA = {
+            "/playground",
             "/api-docs/**",
             "/swagger",
             "/swagger-ui/**",
