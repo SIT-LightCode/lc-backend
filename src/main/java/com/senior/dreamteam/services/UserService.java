@@ -3,13 +3,14 @@ package com.senior.dreamteam.services;
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.exception.DemoGraphqlException;
-import de.mkammerer.argon2.Argon2;
-import de.mkammerer.argon2.Argon2Factory;
+import com.senior.dreamteam.repositories.AuthoritiesRepository;
 
 import com.senior.dreamteam.repositories.TagProblemRepository;
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,10 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    AuthoritiesRepository authoritiesRepository;
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -36,29 +41,19 @@ public class UserService {
         return userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found"));
     }
 
-    public String argon2Hashing(String stringToHash) {
-        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2i, 8, 16);
-        return argon2.hash(22, 65536, 1, stringToHash); //97 length of string
-    }
-
     public User addUser(String role, String name, String email, String password) {
         if (!userRepository.findUserByEmail(email).isEmpty()) {
             throw new DemoGraphqlException("This email have already registered");
         }
+        Authorities authorities = getAuthorityByName(Roles.USER);
+        User newUser = User.builder()
+                .name(name)
+                .email(email)
+                .password(encoder.encode(password))
+                .authorities(List.of(authorities))
+                .build();
 
-        User user = new User();
-        if (Roles.ADMIN.name().equalsIgnoreCase(role)) {
-            user.setAuthorities(List.of(Authorities.builder()
-                    .name(Roles.ADMIN)
-                    .build()));
-        } else {
-            user.setAuthorities(List.of(getAuthorityByName(Roles.ADMIN)));
-        }
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(argon2Hashing(password));
-        userRepository.save(user);
-        return user;
+        return userRepository.save(newUser);
     }
 
     public User updateUser(int id, String role, String name, String email, String password) {
@@ -72,13 +67,13 @@ public class UserService {
         }
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(argon2Hashing(password));
+        user.setPassword(encoder.encode(password));
         userRepository.save(user);
         return user;
     }
 
     public Authorities getAuthorityByName(Roles name) {
-        return userRepository.findByName(name);
+        return authoritiesRepository.findByName(name);
     }
 
 

@@ -33,13 +33,14 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertUser")
-    public User upsertUser(@Argument int id, @Argument String role, @Argument String name, @Argument String email, @Argument String password) {
+    public User upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password) {
         if (id == 0) {
             // add user
-            return userService.addUser(role, name, email, password);
+            User user = userService.addUser(authorities, name, email, password);
+            return user;
         }
         // update user
-        return userService.updateUser(id, role, name, email, password);
+        return userService.updateUser(id, authorities, name, email, password);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeUser")

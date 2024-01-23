@@ -44,19 +44,8 @@ public class SecurityConfig {
 
     private static final String[] FREE_AREA = {
             "/playground",
-            "/api-docs/**",
-            "/swagger",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/webjars/**",
-            "/favicon.ico",
-            "/webjars/**",
+            "/api/graphql",
             "/api/v1/auth",
-            "/api/v1/auth/signup",
     };
 
     private static final String[] ACCOUNT_WHITELIST = {
