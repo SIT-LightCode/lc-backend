@@ -46,6 +46,7 @@ public class SecurityConfig {
             "/playground",
             "/api/graphql",
             "/api/v1/auth",
+            "/api/v1/details"
     };
 
     private static final String[] ACCOUNT_WHITELIST = {

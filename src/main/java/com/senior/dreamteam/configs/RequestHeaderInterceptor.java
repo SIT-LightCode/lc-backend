@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 
 class RequestHeaderInterceptor implements WebGraphQlInterceptor {
-
     @Override
     public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
         String value = request.getHeaders().getFirst("Authorization");
