@@ -13,7 +13,7 @@ type Mutation {
 
     checkAnswer(problemId: Int!, solution: String!): CheckAnswerResult!
 
-    upsertUser(id: Int, name: String, email: String, password: String): User
+    upsertUser(id: Int, authorities: String, name: String, email: String, password: String): User
     removeUser(id: Int!): String
 
 }

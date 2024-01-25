@@ -49,7 +49,7 @@ public class User implements UserDetails, Serializable {
     Date lastPasswordReset = Date.from(LocalDate.of(2023, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
 
     @Builder.Default
-    Boolean enables = false;
+    Boolean enables = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
