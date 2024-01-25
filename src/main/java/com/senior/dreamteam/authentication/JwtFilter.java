@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
         if(token != null) {
-            token = token.substring(7);
+//            token = token.substring(7);
             String username = jwtTokenUtil.getUsernameFromToken(token);
             User user = userService.findUserByEmail(username);
             if (user != null && jwtTokenUtil.isTokenValid(token, user)) {

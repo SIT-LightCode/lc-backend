@@ -74,7 +74,6 @@ type TestcaseResult {
 }
 
 type Authorities {
-    id: ID!
     name: String
 }
 

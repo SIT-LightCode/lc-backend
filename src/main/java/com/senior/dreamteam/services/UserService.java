@@ -34,7 +34,17 @@ public class UserService {
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+
+        users.forEach(user -> {
+            System.out.println(user.getEmail());
+
+            user.getAuthorities().forEach(auth -> {
+                System.out.println(auth.getAuthority());
+            });
+        });
+
+        return users;
     }
 
     public Optional<User> findAllById(int id) {
@@ -62,17 +72,17 @@ public class UserService {
 
     public User updateUser(String emailFromToken, int id, String authorities, String name, String email) {
         User userFromToken = userRepository.findUserByEmail(emailFromToken).orElseThrow(() -> new DemoGraphqlException("This user not found"));
+        User userFromId = userRepository.findUserById(id).orElseThrow(() -> new DemoGraphqlException("This user not found"));
 
         boolean isAdmin = userFromToken.getAuthorities()
                 .stream()
                 .anyMatch(authority -> Roles.ADMIN.toString().equalsIgnoreCase(authority.getAuthority()));
-        if(!isAdmin){
-            if(!email.equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())){
+        if (!isAdmin) {
+            if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())) {
                 log.info("Unauthorized: Cannot Update this User");
                 return User.builder().build();
             }
         }
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found"));
 
         List<Authorities> authoritiesList = authoritiesRepository.findAll();
         List<String> roleList = Arrays.asList(authorities.split(", "));
@@ -89,21 +99,19 @@ public class UserService {
                             .orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-            user.setAuthorities(userAuthorities);
+            userFromId.setAuthorities(userAuthorities);
         } else {
             log.error("Incorrect update role");
             return User.builder().build();
         }
-        user.setName(name);
-        user.setEmail(email);
-        userRepository.save(user);
-        return user;
+        userFromId.setName(name);
+        userFromId.setEmail(email);
+        return userRepository.save(userFromId);
     }
 
     public Authorities getAuthorityByName(Roles name) {
         return authoritiesRepository.findByName(name);
     }
-
 
 
     public String removeUserById(int id) {

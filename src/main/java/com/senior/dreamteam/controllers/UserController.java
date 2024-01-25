@@ -31,15 +31,16 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertUser")
-    public User upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password) {
+    public User upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
         if (id == 0) {
             // add user
             return userService.addUser(name, email, password);
         }
         // update user
-//        String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
-        return User.builder().build();
-//        return userService.updateUser(emailFromToken, id, authorities, name, email);
+        String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
+        System.out.println(token);
+//        return User.builder().build();
+        return userService.updateUser(emailFromToken, id, authorities, name, email);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeUser")
