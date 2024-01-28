@@ -73,8 +73,11 @@ type TestcaseResult {
     message: String
 }
 
+
 type Authorities {
+    id: Int
     name: String
+    user: [User]
 }
 
 type User {
@@ -83,4 +86,11 @@ type User {
     email: String
     authorities: [Authorities]
     problem: [Problem]
+}
+
+type UserResponse {
+    id: Int
+    name: String
+    email: String
+    authorities: [String]
 }

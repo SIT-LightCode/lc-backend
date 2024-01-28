@@ -1,6 +1,7 @@
 package com.senior.dreamteam.services;
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.exception.DemoGraphqlException;
@@ -33,9 +34,8 @@ public class UserService {
     final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public List<User> findAll() {
-        List<User> users = userRepository.findAll();
-        return users;
+    public List<UserResponse> findAll() {
+        return mapListUserToListUserResponse(userRepository.findAll());
     }
 
     public Optional<User> findAllById(int id) {
@@ -46,7 +46,7 @@ public class UserService {
         return userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found"));
     }
 
-    public User addUser(String name, String email, String password) {
+    public UserResponse addUser(String name, String email, String password) {
         if (!userRepository.findUserByEmail(email).isEmpty()) {
             throw new DemoGraphqlException("This email have already registered");
         }
@@ -58,10 +58,10 @@ public class UserService {
                 .authorities(List.of(authorities))
                 .build();
 
-        return userRepository.save(newUser);
+        return mapUserToUserResponse(userRepository.save(newUser));
     }
 
-    public User updateUser(String emailFromToken, int id, String authorities, String name, String email) {
+    public UserResponse updateUser(String emailFromToken, int id, String authorities, String name, String email) {
         User userFromToken = userRepository.findUserByEmail(emailFromToken).orElseThrow(() -> new DemoGraphqlException("This user not found"));
         User userFromId = userRepository.findUserById(id).orElseThrow(() -> new DemoGraphqlException("This user not found"));
 
@@ -71,7 +71,7 @@ public class UserService {
         if (!isAdmin) {
             if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())) {
                 log.info("Unauthorized: Cannot Update this User");
-                return User.builder().build();
+                return UserResponse.builder().build();
             }
         }
 
@@ -93,11 +93,11 @@ public class UserService {
             userFromId.setAuthorities(userAuthorities);
         } else {
             log.error("Incorrect update role");
-            return User.builder().build();
+            return UserResponse.builder().build();
         }
         userFromId.setName(name);
         userFromId.setEmail(email);
-        return userRepository.save(userFromId);
+        return mapUserToUserResponse(userRepository.save(userFromId));
     }
 
     public Authorities getAuthorityByName(Roles name) {
@@ -119,4 +119,17 @@ public class UserService {
         }
     }
 
+    public UserResponse mapUserToUserResponse (User user){
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(user.getId());
+        userResponse.setName(user.getName());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setAuthorities(user.getSimpleAuthorities());
+
+        return userResponse;
+    }
+
+    public List<UserResponse> mapListUserToListUserResponse(List<User> users) {
+        return users.stream().map(this::mapUserToUserResponse).collect(Collectors.toList());
+    }
 }
