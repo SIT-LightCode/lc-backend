@@ -20,7 +20,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 
     Authorities findByName(Roles name);
-
-    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.authorities")
-    List<User> findAllWithAuthorities();
 }

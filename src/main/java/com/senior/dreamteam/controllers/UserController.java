@@ -1,6 +1,7 @@
 package com.senior.dreamteam.controllers;
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
@@ -26,12 +27,12 @@ public class UserController {
 
     final JwtTokenUtil jwtTokenUtil;
     @SchemaMapping(typeName = "Query", value = "getUser")
-    public List<User> findAll() {
+    public List<UserResponse> findAll() {
         return userService.findAll();
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertUser")
-    public User upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
+    public UserResponse upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
         if (id == 0) {
             // add user
             return userService.addUser(name, email, password);
