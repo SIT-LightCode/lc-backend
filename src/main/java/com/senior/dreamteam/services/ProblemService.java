@@ -114,7 +114,7 @@ public class ProblemService {
             paramsList.add(value);
 
         }
-        return paramsList.get(0);
+        return paramsList;
     }
 
 //    private Object parseValue(Object value) throws JSONException {
