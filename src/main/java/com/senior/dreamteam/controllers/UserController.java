@@ -38,7 +38,6 @@ public class UserController {
         }
         // update user
         String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
-        System.out.println(token);
 //        return User.builder().build();
         return userService.updateUser(emailFromToken, id, authorities, name, email);
     }

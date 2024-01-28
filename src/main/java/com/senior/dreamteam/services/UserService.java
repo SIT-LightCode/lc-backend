@@ -35,15 +35,6 @@ public class UserService {
 
     public List<User> findAll() {
         List<User> users = userRepository.findAll();
-
-        users.forEach(user -> {
-            System.out.println(user.getEmail());
-
-            user.getAuthorities().forEach(auth -> {
-                System.out.println(auth.getAuthority());
-            });
-        });
-
         return users;
     }
 
