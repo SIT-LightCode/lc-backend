@@ -72,3 +72,15 @@ type TestcaseResult {
     status: String!
     message: String
 }
+
+type Authorities {
+    name: String
+}
+
+type User {
+    id: ID!
+    name: String
+    email: String
+    authorities: [Authorities]
+    problem: [Problem]
+}
