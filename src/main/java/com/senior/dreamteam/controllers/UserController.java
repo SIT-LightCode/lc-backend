@@ -32,8 +32,8 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertUser")
-    public UserResponse upsertUser(@Argument int id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
-        if (id == 0) {
+    public UserResponse upsertUser(@Argument Integer id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
+        if (id == null) {
             // add user
             return userService.addUser(name, email, password);
         }
