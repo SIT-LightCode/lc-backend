@@ -34,25 +34,26 @@ public class CompilingService {
                 .block(); // This will block until the value is available
     }
 
-    public JSONObject createDataObject(String code, List<Object> params) throws JSONException {
+    public JSONObject createDataObject(String code, JSONArray params) throws JSONException {
         JSONObject data = new JSONObject();
         data.put("code", code);
-        JSONArray paramsArray = new JSONArray();
 
-        for(Object obj : params) {
-            String strObj = String.valueOf(obj);
-            if(strObj.startsWith("{") && strObj.endsWith("}")) {
-                paramsArray.put(new JSONObject(strObj));
-            }
-            else if(strObj.startsWith("[") && strObj.endsWith("]")) {
-                paramsArray.put(new JSONArray(strObj));
-            }
-            else {
-                paramsArray.put(obj);
-            }
-        }
+//        for(Object obj : params) {
+//            String strObj = String.valueOf(obj);
+//            if(strObj.startsWith("{") && strObj.endsWith("}")) {
+//                paramsArray.put(new JSONObject(strObj));
+//            }
+//            else if(strObj.startsWith("[") && strObj.endsWith("]")) {
+//                paramsArray.put(new JSONArray(strObj));
+//            }
+//            else {
+//                paramsArray.put(obj);
+//            }
+//        }
+        System.out.println(params); //[{"1":"asd","2":"21","3":"asd2"},{"1":"asd","2":"2","3":"aa"}]
 
-        data.put("params", paramsArray);
+        data.put("params", params);
+        System.out.println(data);
         return data;
     }
 
