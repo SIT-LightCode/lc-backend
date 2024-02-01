@@ -19,5 +19,7 @@ public class AuthoritiesService {
         return authoritiesRepository.findAll();
     }
 
-
+    public List<Authorities> findByUserId(int userId) {
+        return authoritiesRepository.findByUserId(userId);
+    }
 }

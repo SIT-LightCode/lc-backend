@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface AuthoritiesRepository extends JpaRepository<Authorities, Integer> {
 
     Authorities findByName(Roles name);
+
+    List<Authorities> findByUserId(int userId);
 }
