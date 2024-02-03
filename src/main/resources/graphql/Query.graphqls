@@ -12,7 +12,9 @@ type Query {
     getProblemById(id: ID!): [Problem]
 
     getUser: [UserResponse]
+    getUserByEmail(email: String): UserResponse
 
     getAuthorities: [Authorities]
     getAuthoritiesByUserId(userId: ID!): [Authorities]
+
 }

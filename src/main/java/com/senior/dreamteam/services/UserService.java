@@ -42,6 +42,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public UserResponse getUserByEmail(String email) {
+        return mapUserToUserResponse(userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found")));
+    }
+
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found"));
     }

@@ -48,4 +48,9 @@ public class UserController {
         return userService.removeUserById(id);
     }
 
+    @SchemaMapping(typeName = "Query", value = "getUserByEmail")
+    public UserResponse getUserByEmail(@Argument String email) {
+        return userService.getUserByEmail(email);
+    }
+
 }
