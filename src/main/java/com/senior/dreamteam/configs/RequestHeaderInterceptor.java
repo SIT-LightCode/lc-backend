@@ -18,6 +18,9 @@ class RequestHeaderInterceptor implements WebGraphQlInterceptor {
         if (value == null) {
             value = "";
         }
+        if (value.startsWith("Bearer ")) {
+            value = value.substring(7);
+        }
         String finalValue = value;
         request.configureExecutionInput((executionInput, builder) ->
                 builder.graphQLContext(Collections.singletonMap("token", finalValue)).build());
