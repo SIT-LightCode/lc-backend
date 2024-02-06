@@ -88,6 +88,7 @@ type User {
     email: String
     authorities: [Authorities]
     problem: [Problem]
+    submission: [Submission]
 }
 
 type UserResponse {
@@ -95,6 +96,7 @@ type UserResponse {
     name: String
     email: String
     authorities: [String]
+    submission: [Submission]
 }
 
 type Submission {
