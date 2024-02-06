@@ -82,7 +82,7 @@ public class ProblemService {
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
-                return "Unable to remove problem";
+                throw new DemoGraphqlException("Unable to remove problem");
             }
             return "Problem not found with ID: " + id;
         } catch (Exception e) {

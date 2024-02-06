@@ -2,6 +2,7 @@ package com.senior.dreamteam.controllers;
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
 import com.senior.dreamteam.entities.Roles;
+import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.services.TagProblemService;
 import com.senior.dreamteam.entities.CheckAnswerResult;
 import com.senior.dreamteam.entities.Problem;
@@ -86,12 +87,14 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")
-    public String removeTagProblem(@ContextValue String token, @Argument int id) {
+    public String removeProblem(@ContextValue String token, @Argument int id) {
+        genericValidation.validateIsEmptyToken(token);
         return problemService.removeProblemById(token, id);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "checkAnswer")
     public CheckAnswerResult checkAnswer(@ContextValue String token, @Argument int problemId, @Argument String solution) {
+        genericValidation.validateIsEmptyToken(token);
         return problemService.checkAnswer(token, problemId, solution);
     }
 }

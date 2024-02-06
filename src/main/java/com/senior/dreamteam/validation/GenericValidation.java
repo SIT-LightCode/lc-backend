@@ -6,6 +6,14 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class GenericValidation {
+    // Validate a string with a minimum and maximum length
+    public void validateIsEmptyToken(String token) {
+        if (token.isEmpty()) {
+            throw new DemoGraphqlException("Unauthorized");
+        }
+
+    }
+
     // Validate an integer with a minimum and maximum value
     public void validateParameter(int value, int min, int max) {
         if (value < min || value > max) {
