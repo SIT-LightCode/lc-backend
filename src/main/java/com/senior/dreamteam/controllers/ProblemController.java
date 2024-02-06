@@ -49,12 +49,16 @@ public class ProblemController {
     ) throws JSONException {
         genericValidation.validateParameter(level, 1, 5);
         genericValidation.validateParameter(totalScore, 1, 100);
-        String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
-        Boolean isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
+        String emailFromToken = "";
+        Boolean isAdmin = false;
+        if(!token.isEmpty()){
+            emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
+            isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
+        }
         Problem problem = new Problem();
         if (id != null) {
             problem = problemService.findAllById(id).get();
-            if (problem.getUser().getEmail() == emailFromToken || isAdmin) {
+            if (problem.getUser().getEmail().equals(emailFromToken) || isAdmin) {
                 problem.setName(name);
                 problem.setDescription(description);
                 problem.setTotalScore(totalScore);
