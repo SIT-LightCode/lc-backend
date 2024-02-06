@@ -1,11 +1,18 @@
 package com.senior.dreamteam.authentication;
 
+import com.senior.dreamteam.entities.Authorities;
+import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.entities.User;
+import com.senior.dreamteam.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.Serial;
@@ -13,10 +20,14 @@ import java.io.Serializable;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class JwtTokenUtil implements Serializable {
+
+    @Autowired
+    UserService userService;
     static final String CLAIM_KEY_USERNAME = "sub";
     static final String CLAIM_KEY_ID = "id";
     static final String CLAIM_KEY_ROLE = "role";
@@ -67,6 +78,14 @@ public class JwtTokenUtil implements Serializable {
 
     public String getUsernameFromToken(String token) {
         return getClaimsFromToken(token).getSubject();
+    }
+
+    public List<String> getAuthoritiesFromToken(String token) {
+        return userService.getUserByEmail(getUsernameFromToken(token)).getAuthorities();
+    }
+
+    public User getUserFromToken(String token) {
+        return userService.findUserByEmail(getUsernameFromToken(token));
     }
 
     public Date getExpirationDateFromToken(String token) {

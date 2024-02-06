@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    int id;
 
-//    @ManyToOne
-//    User user;
+    @ManyToOne
+    User user;
 
-//    @ManyToOne
-//    Problem problem;
+    @ManyToOne
+    Problem problem;
 
     String code;
 
-    Long score;
+    int score;
 }

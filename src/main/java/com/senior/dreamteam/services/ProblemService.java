@@ -1,13 +1,12 @@
 package com.senior.dreamteam.services;
 
-import com.senior.dreamteam.entities.Example;
+import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.exception.DemoGraphqlException;
-import com.senior.dreamteam.entities.CheckAnswerResult;
-import com.senior.dreamteam.entities.ExampleResult;
-import com.senior.dreamteam.entities.Problem;
-import com.senior.dreamteam.entities.TestcaseResult;
 import com.senior.dreamteam.repositories.ProblemRepository;
-import com.senior.dreamteam.entities.Testcase;
+import com.senior.dreamteam.repositories.SubmissionRepository;
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class ProblemService {
 
     @Autowired
@@ -35,8 +35,14 @@ public class ProblemService {
     @Autowired
     CompilingService compilingService;
 
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    SubmissionRepository submissionRepository;
+
     private final int PARAM_GENERATION_COUNT = 1500;
-    private int randomNumberCount = 0;
+    private int RANDOM_NUMBER_COUNT = 0;
 
 
     public List<Problem> findAll() {
@@ -67,16 +73,18 @@ public class ProblemService {
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
-    public String removeProblemById(int id) {
+    public String removeProblemById(String token, int id) {
         try {
             Optional<Problem> problemOptional = problemRepository.findById(id);
-
+            String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                problemRepository.deleteById(id);
-                return "Problem removed successfully";
-            } else {
-                return "Problem not found with ID: " + id;
+                if (problemOptional.get().getUser().getEmail() == email || jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name())) {
+                    problemRepository.deleteById(id);
+                    return "Problem removed successfully";
+                }
+                return "Unable to remove problem";
             }
+            return "Problem not found with ID: " + id;
         } catch (Exception e) {
             throw new DemoGraphqlException("An error occurred: " + e.getMessage());
         }
@@ -88,7 +96,7 @@ public class ProblemService {
             JSONObject newParams = generateSingleSetOfParams(exampleParameters);
             generatedParams.put(newParams);
         }
-        randomNumberCount = 0;
+        RANDOM_NUMBER_COUNT = 0;
         return generatedParams;
     }
 
@@ -240,16 +248,16 @@ public class ProblemService {
         List<Integer> specialNumbers = Arrays.asList(0, 1, -1, Integer.MAX_VALUE, Integer.MIN_VALUE);
         Random random = new Random();
         int bound;
-        if (randomNumberCount < 200) {
+        if (RANDOM_NUMBER_COUNT < 200) {
             bound = 10;
-        } else if (randomNumberCount < 500) {
+        } else if (RANDOM_NUMBER_COUNT < 500) {
             bound = 50;
-        } else if (randomNumberCount < 1000) {
+        } else if (RANDOM_NUMBER_COUNT < 1000) {
             bound = 100;
         } else {
             bound = 150;
         }
-        randomNumberCount++;
+        RANDOM_NUMBER_COUNT++;
         if (random.nextBoolean()) {
             return specialNumbers.get(random.nextInt(specialNumbers.size()));
         } else {
@@ -258,7 +266,8 @@ public class ProblemService {
     }
 
     @Transactional
-    public CheckAnswerResult checkAnswer(int problemId, String solution) {
+    public CheckAnswerResult checkAnswer(String token, int problemId, String solution) {
+        Boolean isCorrect = true;
         String lang = "js";
         List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
         List<ExampleResult> exampleResult = new ArrayList<>();
@@ -296,6 +305,7 @@ public class ProblemService {
                         exampleResult.add(new ExampleResult(example.getId(), "passed", "Expected: " + output + ", Got: " + result));
                     } else {
                         exampleResult.add(new ExampleResult(example.getId(), "failed", "Expected: " + output + ", Got: " + result));
+                        isCorrect = false;
                     }
                     index++;
                 }
@@ -340,6 +350,7 @@ public class ProblemService {
                         testcaseResult.add(new TestcaseResult(testcase.getId(), "passed", ""));
                     } else {
                         testcaseResult.add(new TestcaseResult(testcase.getId(), "failed", ""));
+                        isCorrect = false;
                     }
 
                     index++;
@@ -353,6 +364,17 @@ public class ProblemService {
         CheckAnswerResult results = new CheckAnswerResult();
         results.setExampleResults(exampleResult);
         results.setTestcaseResults(testcaseResult);
+
+        if (isCorrect) {
+            try {
+                User user = jwtTokenUtil.getUserFromToken(token);
+                Problem problem = problemRepository.findProblemById(problemId).get();
+                submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).build());
+            } catch (Exception e) {
+                log.error("Could not save submission: " + e.getMessage());
+                throw new DemoGraphqlException("Could not save submission: " + e.getMessage());
+            }
+        }
 
         return results;
     }

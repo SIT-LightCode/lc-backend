@@ -8,7 +8,7 @@ type Mutation {
     upsertTagProblem(id: Int, tagId: Int!, problemId: Int!): TagProblem
     removeTagProblem(id: Int!): String
 
-    upsertProblem(id: Int, arrayTagId: String, name: String, description: String, solution: String, exampleParameter: String, level: Int, totalScore: Int): Problem
+    upsertProblem(id: Int, arrayTagId: String, name: String, description: String, solution: String, exampleParameter: String, level: Int, totalScore: Int, isOfficial: Boolean): Problem
     removeProblem(id: Int!): String
 
     checkAnswer(problemId: Int!, solution: String!): CheckAnswerResult!
