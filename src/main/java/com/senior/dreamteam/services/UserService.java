@@ -4,6 +4,7 @@ import com.senior.dreamteam.authentication.JwtTokenUtil;
 import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
+import com.senior.dreamteam.entities.Submission;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.repositories.AuthoritiesRepository;
 
@@ -123,14 +124,19 @@ public class UserService {
         }
     }
 
-    public UserResponse mapUserToUserResponse (User user){
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(user.getId());
-        userResponse.setName(user.getName());
-        userResponse.setEmail(user.getEmail());
-        userResponse.setAuthorities(user.getSimpleAuthorities());
-
-        return userResponse;
+    public UserResponse mapUserToUserResponse(User user) {
+        try {
+            UserResponse userResponse = new UserResponse();
+            userResponse.setId(user.getId());
+            userResponse.setName(user.getName());
+            userResponse.setEmail(user.getEmail());
+            userResponse.setAuthorities(user.getSimpleAuthorities());
+            userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
+            return userResponse;
+        } catch (Exception e) {
+            log.error("Could not Map User to UserResponse: " + e.getMessage());
+            return UserResponse.builder().build();
+        }
     }
 
     public List<UserResponse> mapListUserToListUserResponse(List<User> users) {

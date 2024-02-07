@@ -31,6 +31,8 @@ public class Problem {
 
     String exampleParameter;
 
+    Boolean isOfficial;
+
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Example> example;
 
@@ -41,8 +43,8 @@ public class Problem {
 
     int totalScore;
 
-//    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-//    List<Submission> submission;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    List<Submission> submission;
 
     @ManyToOne
     User user;

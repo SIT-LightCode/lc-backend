@@ -36,10 +36,12 @@ type Problem {
     description: String
     solution: String
     exampleParameter: String
+    isOfficial: Boolean
     example: [Example]
     testcase: [Testcase]
     level: Int
     totalScore: Int
+    submission: [Submission]
 }
 
 type Example {
@@ -86,6 +88,14 @@ type User {
     email: String
     authorities: [Authorities]
     problem: [Problem]
+    submission: [Submission]
+}
+
+type Submission {
+    id: Int
+    user: User
+    problem: Problem
+    score: Int
 }
 
 type UserResponse {
@@ -93,4 +103,5 @@ type UserResponse {
     name: String
     email: String
     authorities: [String]
+    score: Int
 }

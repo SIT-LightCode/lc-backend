@@ -1,5 +1,6 @@
 package com.senior.dreamteam.controllers.payload;
 
+import com.senior.dreamteam.entities.Submission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class UserResponse {
     private String name;
     private String email;
     private List<String> authorities;
+    private int score;
 
 }
