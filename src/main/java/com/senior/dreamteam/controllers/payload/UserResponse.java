@@ -17,6 +17,6 @@ public class UserResponse {
     private String name;
     private String email;
     private List<String> authorities;
-    private List<Submission> submissions;
+    private int score;
 
 }

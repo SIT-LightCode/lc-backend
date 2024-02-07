@@ -91,17 +91,17 @@ type User {
     submission: [Submission]
 }
 
+type Submission {
+    id: Int
+    user: User
+    problem: Problem
+    score: Int
+}
+
 type UserResponse {
     id: Int
     name: String
     email: String
     authorities: [String]
-    submission: [Submission]
-}
-
-type Submission {
-    id: Int
-    user: User
-    problem: Problem
     score: Int
 }
