@@ -7,6 +7,7 @@ import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.TagProblemService;
 import com.senior.dreamteam.services.UserService;
+import com.senior.dreamteam.validation.GenericValidation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -24,8 +25,9 @@ public class UserController {
     final TagService tagService;
     final ProblemService problemService;
     final UserService userService;
-
     final JwtTokenUtil jwtTokenUtil;
+    GenericValidation genericValidation = new GenericValidation();
+
     @SchemaMapping(typeName = "Query", value = "getUser")
     public List<UserResponse> findAll() {
         return userService.findAll();
@@ -38,7 +40,9 @@ public class UserController {
             return userService.addUser(name, email, password);
         }
         // update user
+        genericValidation.validateIsEmptyToken(token);
         String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
+        System.out.println("here");
         return userService.updateUser(emailFromToken, id, authorities, name, email);
     }
 
