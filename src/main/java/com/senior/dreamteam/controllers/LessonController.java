@@ -5,10 +5,13 @@ import com.senior.dreamteam.entities.LessonInput;
 import com.senior.dreamteam.services.LessonService;
 import com.senior.dreamteam.entities.Tag;
 import com.senior.dreamteam.services.TagService;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Collections;
@@ -28,17 +31,16 @@ public class LessonController {
     }
 
     @SchemaMapping(typeName = "Query", value = "getLessonByTagId")
-    public List<Lesson> findAllByTag_Id(String id) {
+    public List<Lesson> findAllByTag_Id(@Min(value = 1, message = "userId must be greater than or equal to 1") int id) {
         try {
-            int tagId = Integer.parseInt(id);
-            return lessonService.findAllByTagId(tagId);
+            return lessonService.findAllByTagId(id);
         } catch (NumberFormatException e) {
             return Collections.emptyList();
         }
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertLesson")
-    public Lesson upsertLesson(@Argument LessonInput lessonInput) {
+    public Lesson upsertLesson(@Validated @Argument LessonInput lessonInput) {
         Lesson lesson = new Lesson();
         lesson.setId(lessonInput.getId());
         lesson.setName(lessonInput.getName());
@@ -50,7 +52,7 @@ public class LessonController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeLesson")
-    public String removeLesson(@Argument int lessonId) {
+    public String removeLesson(@Min(value = 1, message = "lessonId must be greater than or equal to 1") @Argument int lessonId) {
         return lessonService.removeLessonById(lessonId);
     }
 

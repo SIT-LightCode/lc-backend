@@ -10,6 +10,8 @@ import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.UserService;
 import com.senior.dreamteam.validation.GenericValidation;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
@@ -39,20 +41,27 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Query", value = "getProblemById")
-    public Problem findAllById(@Argument int id) {
+    public Problem findAllById(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         return problemService.findAllById(id).get();
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertProblem")
-    public Problem upsertProblem(@Argument Integer id, @Argument String name, @Argument String description,
-                                 @Argument String arrayTagId,
-                                 @Argument String solution, @Argument String exampleParameter, @Argument int level, @Argument int totalScore, @Argument Boolean isOfficial, @ContextValue String token
+    public Problem upsertProblem(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument Integer id,
+                                 @NotEmpty(message = "name must not be empty") @Argument String name,
+                                 @NotEmpty(message = "description must not be empty") @Argument String description,
+                                 @NotEmpty(message = "tag id must not be empty") @Argument String arrayTagId,
+                                 @NotEmpty(message = "solution must not be empty") @Argument String solution,
+                                 @Argument String exampleParameter,
+                                 @Min(value = 0, message = "level must be greater than or equal to 0") @Argument int level,
+                                 @Min(value = 0, message = "total score must be greater than or equal to 0") @Argument int totalScore,
+                                 @NotEmpty(message = "solution must not be empty") @Argument Boolean isOfficial,
+                                 @ContextValue String token
     ) throws JSONException {
         genericValidation.validateParameter(level, 1, 5);
         genericValidation.validateParameter(totalScore, 1, 100);
         String emailFromToken = "";
         Boolean isAdmin = false;
-        if(!token.isEmpty()){
+        if (!token.isEmpty()) {
             emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
             isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
         }
@@ -64,7 +73,7 @@ public class ProblemController {
                 problem.setDescription(description);
                 problem.setTotalScore(totalScore);
                 problem.setLevel(level);
-                if(isAdmin){
+                if (isAdmin) {
                     problem.setIsOfficial(isOfficial);
                 }
                 tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(problem, arrayTagId);
@@ -78,7 +87,7 @@ public class ProblemController {
         problem.setTotalScore(totalScore);
         problem.setLevel(level);
         problem.setIsOfficial(false);
-        if(isAdmin){
+        if (isAdmin) {
             problem.setIsOfficial(isOfficial);
         }
         Problem result = problemService.upsertProblem(problem);
@@ -87,13 +96,14 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")
-    public String removeProblem(@ContextValue String token, @Argument int id) {
+    public String removeProblem(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         genericValidation.validateIsEmptyToken(token);
         return problemService.removeProblemById(token, id);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "checkAnswer")
-    public CheckAnswerResult checkAnswer(@ContextValue String token, @Argument int problemId, @Argument String solution) {
+    public CheckAnswerResult checkAnswer(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int problemId,
+                                         @NotEmpty(message = "solution must not be empty") @Argument String solution) {
         genericValidation.validateIsEmptyToken(token);
         return problemService.checkAnswer(token, problemId, solution);
     }
