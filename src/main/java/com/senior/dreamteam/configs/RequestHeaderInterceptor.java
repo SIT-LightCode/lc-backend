@@ -22,7 +22,9 @@ class RequestHeaderInterceptor implements WebGraphQlInterceptor {
     public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
         String value = request.getHeaders().getFirst("Authorization");
         if (value == null) {
-            value = "";
+            request.configureExecutionInput((executionInput, builder) ->
+                    builder.graphQLContext(Collections.singletonMap("token", "")).build());
+            return chain.next(request);
         }
         if (value.startsWith("Bearer ")) {
             value = value.substring(7);
