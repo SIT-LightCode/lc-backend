@@ -42,7 +42,6 @@ public class UserController {
         // update user
         genericValidation.validateIsEmptyToken(token);
         String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
-        System.out.println("here");
         return userService.updateUser(emailFromToken, id, authorities, name, email);
     }
 

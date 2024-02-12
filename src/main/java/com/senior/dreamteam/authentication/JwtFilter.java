@@ -2,6 +2,7 @@ package com.senior.dreamteam.authentication;
 
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.services.TokenService;
 import com.senior.dreamteam.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
     final JwtTokenUtil jwtTokenUtil;
 
     final UserService userService;
+    final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -35,6 +37,14 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             User user = userService.findUserByEmail(username);
             if (user != null && jwtTokenUtil.isTokenValid(token, user)) {
+                try {
+                    if (tokenService.findTokenByToken(token).getIsRevoke()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 log.info("user {} perform some action", username);

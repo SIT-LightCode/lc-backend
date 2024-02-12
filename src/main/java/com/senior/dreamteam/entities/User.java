@@ -38,6 +38,9 @@ public class User implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Problem> problem;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Token> token;
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    List<Problem> likedProblem;
