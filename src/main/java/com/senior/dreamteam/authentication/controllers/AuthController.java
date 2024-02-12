@@ -40,7 +40,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest login) {
         User user = loginWithEmail(login.email(), login.password());
-        return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY), createToken(user, ONE_WEEK)));
+        return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
     }
 
     @PostMapping("/logout")
@@ -58,19 +58,19 @@ public class AuthController {
         String username = jwtTokenUtil.getUsernameFromToken(token.token());
         User user = userService.findUserByEmail(username);
         if (jwtTokenUtil.isTokenValid(token.token(), user) && !jwtTokenUtil.isAccessToken(token.token())) {
-            return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY), token.token()));
+            return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), token.token()));
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot refresh token");
     }
 
-    private String createToken(User user, Long expiration) {
+    private String createToken(User user, Long expiration, boolean isAccess) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password is incorrect");
         }
         if (!user.isEnabled()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this account is locked");
         }
-        return jwtTokenUtil.generateJWT(user, expiration);
+        return jwtTokenUtil.generateJWT(user, expiration, isAccess);
     }
 
     private User loginWithEmail(String email, String password) {

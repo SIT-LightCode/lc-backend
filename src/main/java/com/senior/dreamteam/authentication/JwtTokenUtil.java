@@ -46,7 +46,7 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET;
 
 
-    public String generateJWT(User user, Long expiration) {
+    public String generateJWT(User user, Long expiration, boolean isAccess) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_ID, user.getId().toString());
         claims.put(CLAIM_KEY_USERNAME, user.getEmail());
@@ -55,7 +55,7 @@ public class JwtTokenUtil implements Serializable {
 
         Date expirationDate = generateExpirationDate(expiration);
         String token = generateToken(claims, expirationDate);
-        tokenService.upsertToken(Token.builder().token(token).user(user).isRevoke(false).expiration(expirationDate).build());
+        tokenService.upsertToken(Token.builder().token(token).user(user).isRevoke(false).expiration(expirationDate).isAccess(isAccess).build());
         return token;
     }
 
