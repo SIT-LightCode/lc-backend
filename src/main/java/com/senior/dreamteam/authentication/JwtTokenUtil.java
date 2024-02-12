@@ -122,6 +122,10 @@ public class JwtTokenUtil implements Serializable {
         return tokenService.findTokenByToken(token).getIsRevoke();
     }
 
+    public Boolean isAccessToken(String token) throws Exception {
+        return tokenService.findTokenByToken(token).getIsAccess();
+    }
+
     public Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return created.before(lastPasswordReset);
     }

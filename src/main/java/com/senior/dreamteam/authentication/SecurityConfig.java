@@ -45,7 +45,7 @@ public class SecurityConfig {
     private static final String[] FREE_AREA = {
             "/playground",
             "/api/graphql",
-            "/api/v1/auth",
+            "/api/v1/auth/**",
             "/api/v1/details"
     };
 
@@ -89,19 +89,6 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-    List<String> allowedOrigins = Arrays.asList(
-            "*"
-    );
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(allowedOrigins);
-//        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
 
     @SneakyThrows
     @Bean

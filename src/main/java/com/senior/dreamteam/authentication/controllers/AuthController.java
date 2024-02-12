@@ -33,10 +33,14 @@ public class AuthController {
     final UserService userService;
     final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     final JwtTokenUtil jwtTokenUtil;
-    
+
+    final Long ONE_WEEK = 604800L;
+    final Long ONE_DAY = 86400L;
+
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest login) {
-        return createToken(loginWithEmail(login.email(), login.password()));
+        User user = loginWithEmail(login.email(), login.password());
+        return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY), createToken(user, ONE_WEEK)));
     }
 
     @PostMapping("/logout")
@@ -45,19 +49,28 @@ public class AuthController {
             jwtTokenUtil.revokeToken(token.token());
             return ResponseEntity.ok("token revoked");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Cannot revoke this token");
+            return ResponseEntity.badRequest().body("cannot revoke this token");
         }
     }
 
-    private ResponseEntity<JwtResponse> createToken(User user) {
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@RequestBody JwtRequest token) throws Exception {
+        String username = jwtTokenUtil.getUsernameFromToken(token.token());
+        User user = userService.findUserByEmail(username);
+        if (jwtTokenUtil.isTokenValid(token.token(), user) && !jwtTokenUtil.isAccessToken(token.token())) {
+            return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY), token.token()));
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot refresh token");
+    }
+
+    private String createToken(User user, Long expiration) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password is incorrect");
         }
         if (!user.isEnabled()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this account is locked");
         }
-        JwtResponse jwtResponse = new JwtResponse(jwtTokenUtil.generateJWT(user, 604800L));
-        return ResponseEntity.ok(jwtResponse);
+        return jwtTokenUtil.generateJWT(user, expiration);
     }
 
     private User loginWithEmail(String email, String password) {
