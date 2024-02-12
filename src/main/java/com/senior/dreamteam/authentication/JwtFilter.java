@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     log.info("user {} perform some action", username);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Token is invalid");
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
