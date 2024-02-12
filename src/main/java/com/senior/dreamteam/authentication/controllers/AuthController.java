@@ -33,8 +33,7 @@ public class AuthController {
     final UserService userService;
     final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     final JwtTokenUtil jwtTokenUtil;
-
-
+    
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest login) {
         return createToken(loginWithEmail(login.email(), login.password()));

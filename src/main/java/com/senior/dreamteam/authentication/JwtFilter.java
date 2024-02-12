@@ -36,21 +36,17 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             String username = jwtTokenUtil.getUsernameFromToken(token);
             User user = userService.findUserByEmail(username);
-            if (user != null && jwtTokenUtil.isTokenValid(token, user)) {
-                try {
-                    if (tokenService.findTokenByToken(token).getIsRevoke()) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            try {
+                if (user != null && jwtTokenUtil.isTokenValid(token, user)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    log.info("user {} perform some action", username);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 }
-
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                log.info("user {} perform some action", username);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         filterChain.doFilter(request, response);
