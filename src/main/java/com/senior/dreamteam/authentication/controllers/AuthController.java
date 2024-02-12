@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,13 +39,13 @@ public class AuthController {
     final Long ONE_DAY = 86400L;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest login) {
+    public ResponseEntity<JwtResponse> login(@Validated @RequestBody LoginRequest login) {
         User user = loginWithEmail(login.email(), login.password());
         return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody JwtResponse token) throws Exception {
+    public ResponseEntity<String> logout(@Validated @RequestBody JwtResponse token) throws Exception {
         try {
             jwtTokenUtil.revokeToken(token.token());
             jwtTokenUtil.revokeToken(token.refreshToken());
@@ -55,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtResponse> refreshToken(@RequestBody JwtRequest token) throws Exception {
+    public ResponseEntity<JwtResponse> refreshToken(@Validated @RequestBody JwtRequest token) throws Exception {
         String username = jwtTokenUtil.getUsernameFromToken(token.token());
         User user = userService.findUserByEmail(username);
         if (jwtTokenUtil.isTokenValid(token.token(), user) && !jwtTokenUtil.isAccessToken(token.token())) {

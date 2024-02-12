@@ -1,3 +1,5 @@
 package com.senior.dreamteam.authentication.payload;
 
-public record JwtRequest(String token) { }
+import jakarta.validation.constraints.NotEmpty;
+
+public record JwtRequest(@NotEmpty(message = "Token cannot be empty") String token) { }
