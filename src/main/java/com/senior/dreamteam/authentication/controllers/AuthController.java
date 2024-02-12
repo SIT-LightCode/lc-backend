@@ -40,6 +40,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Validated @RequestBody LoginRequest login) {
+//        return ResponseEntity.ok(new JwtResponse("", ""));
         User user = loginWithEmail(login.email(), login.password());
         return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
     }
