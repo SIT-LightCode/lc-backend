@@ -44,9 +44,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody JwtRequest token) throws Exception {
+    public ResponseEntity<String> logout(@RequestBody JwtResponse token) throws Exception {
         try {
             jwtTokenUtil.revokeToken(token.token());
+            jwtTokenUtil.revokeToken(token.refreshToken());
             return ResponseEntity.ok("token revoked");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("cannot revoke this token");
