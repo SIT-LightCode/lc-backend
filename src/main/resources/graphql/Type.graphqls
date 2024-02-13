@@ -42,6 +42,7 @@ type Problem {
     level: Int
     totalScore: Int
     submission: [Submission]
+    user: User
 }
 
 type Example {
