@@ -1,5 +1,6 @@
 package com.senior.dreamteam.entities;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @NoArgsConstructor
@@ -9,6 +10,9 @@ import lombok.*;
 public class TagInput {
 
     int id;
+
+    @NotEmpty(message = "topic must not be empty")
     String topic;
+    @NotEmpty(message = "description must not be empty")
     String description;
 }

@@ -6,6 +6,7 @@ import com.senior.dreamteam.entities.Problem;
 import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.entities.Tag;
 import com.senior.dreamteam.services.TagService;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -30,25 +31,25 @@ public class TagProblemController {
     }
 
     @SchemaMapping(typeName = "Query", value = "getTagProblemById")
-    public TagProblem findAllById(@Argument int id) {
-            return tagProblemService.findAllById(id).get();
+    public TagProblem findAllById(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
+        return tagProblemService.findAllById(id).get();
     }
 
     @SchemaMapping(typeName = "Query", value = "getTagProblemByTagId")
-    public List<TagProblem> findTagProblemsByTagId(@Argument int id) {
+    public List<TagProblem> findTagProblemsByTagId(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         return tagProblemService.findTagProblemsByTagId(id);
     }
 
 
     @SchemaMapping(typeName = "Mutation", value = "upsertTagProblem")
-    public TagProblem upsertTagProblem(@Argument int id, @Argument int tagId, @Argument int problemId) {
+    public TagProblem upsertTagProblem(@Argument int id, @Min(value = 1, message = "tag id must be greater than or equal to 1") @Argument int tagId, @Min(value = 1, message = "problem id must be greater than or equal to 1") @Argument int problemId) {
         Tag tag = tagService.findAllById(tagId).get();
         Problem problem = problemService.findAllById(problemId).get();
         return tagProblemService.upsertTagProblem(new TagProblem(id, tag, problem));
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeTagProblem")
-    public String removeTagProblem(@Argument int tagProblemId) {
+    public String removeTagProblem(@Min(value = 1, message = "tag_problem id must be greater than or equal to 1") @Argument int tagProblemId) {
         return tagProblemService.removeTagProblemById(tagProblemId);
     }
 

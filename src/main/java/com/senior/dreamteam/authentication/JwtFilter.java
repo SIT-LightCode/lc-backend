@@ -2,6 +2,7 @@ package com.senior.dreamteam.authentication;
 
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.services.TokenService;
 import com.senior.dreamteam.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,23 +25,29 @@ public class JwtFilter extends OncePerRequestFilter {
     final JwtTokenUtil jwtTokenUtil;
 
     final UserService userService;
+    final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
-        if (token != null) {
+        if (token != null && !token.isEmpty()) {
+            System.out.println("token: " + token);
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            User user = userService.findUserByEmail(username);
-            if (user != null && jwtTokenUtil.isTokenValid(token, user)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                log.info("user {} perform some action", username);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            try {
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                User user = userService.findUserByEmail(username);
+                if (user != null && jwtTokenUtil.isTokenValid(token, user) && jwtTokenUtil.isAccessToken(token)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    log.info("user {} perform some action", username);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Token is invalid");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         filterChain.doFilter(request, response);

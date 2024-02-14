@@ -7,6 +7,10 @@ import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.TagProblemService;
 import com.senior.dreamteam.services.UserService;
+import com.senior.dreamteam.validation.GenericValidation;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -24,31 +28,33 @@ public class UserController {
     final TagService tagService;
     final ProblemService problemService;
     final UserService userService;
-
     final JwtTokenUtil jwtTokenUtil;
+    GenericValidation genericValidation = new GenericValidation();
+
     @SchemaMapping(typeName = "Query", value = "getUser")
     public List<UserResponse> findAll() {
         return userService.findAll();
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertUser")
-    public UserResponse upsertUser(@Argument Integer id, @Argument String authorities, @Argument String name, @Argument String email, @Argument String password, @ContextValue String token) {
+    public UserResponse upsertUser(@Argument Integer id, @Argument String authorities, @NotEmpty(message = "name must not be empty") @Argument String name, @Email(message = "email must be correctly format") @Argument String email, @Argument String password, @ContextValue String token) {
         if (id == null) {
             // add user
             return userService.addUser(name, email, password);
         }
         // update user
+        genericValidation.validateIsEmptyToken(token);
         String emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
         return userService.updateUser(emailFromToken, id, authorities, name, email);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeUser")
-    public String removeUser(@Argument int id) {
+    public String removeUser(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         return userService.removeUserById(id);
     }
 
     @SchemaMapping(typeName = "Query", value = "getUserByEmail")
-    public UserResponse getUserByEmail(@Argument String email) {
+    public UserResponse getUserByEmail(@Email(message = "email must be correctly format") @Argument String email) {
         return userService.getUserByEmail(email);
     }
 

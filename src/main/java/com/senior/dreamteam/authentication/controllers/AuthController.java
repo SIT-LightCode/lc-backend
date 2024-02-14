@@ -2,8 +2,10 @@ package com.senior.dreamteam.authentication.controllers;
 
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.payload.JwtRequest;
 import com.senior.dreamteam.authentication.payload.JwtResponse;
 import com.senior.dreamteam.authentication.payload.LoginRequest;
+import com.senior.dreamteam.entities.Token;
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,21 +35,45 @@ public class AuthController {
     final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     final JwtTokenUtil jwtTokenUtil;
 
+    final Long ONE_WEEK = 604800L;
+    final Long ONE_DAY = 86400L;
 
-    @PostMapping("")
-    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest login) {
-        return createToken(loginWithEmail(login.email(), login.password()));
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponse> login(@Validated @RequestBody LoginRequest login) {
+//        return ResponseEntity.ok(new JwtResponse("", ""));
+        User user = loginWithEmail(login.email(), login.password());
+        return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
     }
 
-    private ResponseEntity<JwtResponse> createToken(User user) {
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@Validated @RequestBody JwtResponse token) throws Exception {
+        try {
+            jwtTokenUtil.revokeToken(token.token());
+            jwtTokenUtil.revokeToken(token.refreshToken());
+            return ResponseEntity.ok("token revoked");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("cannot revoke this token");
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@Validated @RequestBody JwtRequest token) throws Exception {
+        String username = jwtTokenUtil.getUsernameFromToken(token.token());
+        User user = userService.findUserByEmail(username);
+        if (jwtTokenUtil.isTokenValid(token.token(), user) && !jwtTokenUtil.isAccessToken(token.token())) {
+            return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), token.token()));
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot refresh token");
+    }
+
+    private String createToken(User user, Long expiration, boolean isAccess) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password is incorrect");
         }
-        if(!user.isEnabled()) {
+        if (!user.isEnabled()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this account is locked");
         }
-        JwtResponse jwtResponse = new JwtResponse(jwtTokenUtil.generateJWT(user, 604800L));
-        return ResponseEntity.ok(jwtResponse);
+        return jwtTokenUtil.generateJWT(user, expiration, isAccess);
     }
 
     private User loginWithEmail(String email, String password) {

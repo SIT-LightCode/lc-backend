@@ -2,7 +2,9 @@ package com.senior.dreamteam.authentication;
 
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
+import com.senior.dreamteam.entities.Token;
 import com.senior.dreamteam.entities.User;
+import com.senior.dreamteam.services.TokenService;
 import com.senior.dreamteam.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -28,6 +30,10 @@ public class JwtTokenUtil implements Serializable {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    TokenService tokenService;
+
     static final String CLAIM_KEY_USERNAME = "sub";
     static final String CLAIM_KEY_ID = "id";
     static final String CLAIM_KEY_ROLE = "role";
@@ -39,27 +45,32 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET;
 
 
-    public String generateJWT(User user, Long expiration) {
-        Map<String,Object> claims = new HashMap<>();
+    public String generateJWT(User user, Long expiration, boolean isAccess) {
+        Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_ID, user.getId().toString());
         claims.put(CLAIM_KEY_USERNAME, user.getEmail());
         claims.put(CLAIM_KEY_ROLE, user.getSimpleAuthorities());
         claims.put(CLAIM_KEY_CREATED, new Date());
-        return generateToken(claims, expiration);
+
+        Date expirationDate = generateExpirationDate(expiration);
+        String token = generateToken(claims, expirationDate);
+        tokenService.upsertToken(Token.builder().token(token).user(user).isRevoke(false).expiration(expirationDate).isAccess(isAccess).build());
+        return token;
     }
 
     public String refreshJWT(String token, Long expiration) {
+        Date expirationDate = generateExpirationDate(expiration);
         Claims claims = getClaimsFromToken(token);
         claims.put(CLAIM_KEY_CREATED, new Date());
-        return generateToken(claims, expiration);
+        return generateToken(claims, expirationDate);
     }
 
-    public String generateToken(Map<String, Object> claims, Long expiration){
+    public String generateToken(Map<String, Object> claims, Date expiratioDate) {
         final Key key = new SecretKeySpec(SECRET.getBytes(), SignatureAlgorithm.HS512.getJcaName());
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(generateExpirationDate(expiration))
+                .setExpiration(expiratioDate)
                 .compact();
     }
 
@@ -93,7 +104,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public Date getCreatedDateFromToken(String token) {
-        return new Date((Long) getClaimsFromToken(token).get(CLAIM_KEY_CREATED)) ;
+        return new Date((Long) getClaimsFromToken(token).get(CLAIM_KEY_CREATED));
     }
 
     public Boolean isTokenExpired(String token) {
@@ -101,9 +112,17 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public Boolean isTokenValid(String token, User user) {
+    public Boolean isTokenValid(String token, User user) throws Exception {
         final String username = getUsernameFromToken(token);
-        return (username.equals(user.getEmail()) && !isTokenExpired(token));
+        return (username.equals(user.getEmail()) && !isTokenExpired(token) && !isTokenRevoked(token));
+    }
+
+    public Boolean isTokenRevoked(String token) throws Exception {
+        return tokenService.findTokenByToken(token).getIsRevoke();
+    }
+
+    public Boolean isAccessToken(String token) throws Exception {
+        return tokenService.findTokenByToken(token).getIsAccess();
     }
 
     public Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
@@ -113,5 +132,11 @@ public class JwtTokenUtil implements Serializable {
     public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
         final Date created = getCreatedDateFromToken(token);
         return (!isCreatedBeforeLastPasswordReset(created, lastPasswordReset) && !isTokenExpired(token));
+    }
+
+    public Token revokeToken(String tokenString) throws Exception {
+        Token token = tokenService.findTokenByToken(tokenString);
+        token.setIsRevoke(true);
+        return tokenService.upsertToken(token);
     }
 }

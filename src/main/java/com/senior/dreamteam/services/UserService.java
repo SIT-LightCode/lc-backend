@@ -132,6 +132,9 @@ public class UserService {
             userResponse.setEmail(user.getEmail());
             userResponse.setAuthorities(user.getSimpleAuthorities());
             userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
+            if (user.getSubmission() != null) {
+                userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
+            }
             return userResponse;
         } catch (Exception e) {
             log.error("Could not Map User to UserResponse: " + e.getMessage());
