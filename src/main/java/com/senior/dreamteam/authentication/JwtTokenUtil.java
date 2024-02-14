@@ -34,7 +34,6 @@ public class JwtTokenUtil implements Serializable {
     @Autowired
     TokenService tokenService;
 
-
     static final String CLAIM_KEY_USERNAME = "sub";
     static final String CLAIM_KEY_ID = "id";
     static final String CLAIM_KEY_ROLE = "role";

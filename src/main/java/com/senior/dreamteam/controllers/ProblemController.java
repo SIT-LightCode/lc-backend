@@ -61,7 +61,7 @@ public class ProblemController {
         genericValidation.validateParameter(totalScore, 1, 100);
         String emailFromToken = "";
         Boolean isAdmin = false;
-        if (!token.isEmpty()) {
+        if(!token.isEmpty()){
             emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
             isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
         }

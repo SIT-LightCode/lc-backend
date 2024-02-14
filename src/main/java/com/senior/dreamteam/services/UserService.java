@@ -131,6 +131,7 @@ public class UserService {
             userResponse.setName(user.getName());
             userResponse.setEmail(user.getEmail());
             userResponse.setAuthorities(user.getSimpleAuthorities());
+            userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
             if (user.getSubmission() != null) {
                 userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
             }
