@@ -55,7 +55,7 @@ public class ProblemController {
                                  @Argument String exampleParameter,
                                  @Min(value = 0, message = "level must be greater than or equal to 0") @Max(value = 5, message = "level must be lesser than or equal to 5") @Argument int level,
                                  @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
-                                 @NotEmpty(message = "solution must not be empty") @Argument Boolean isOfficial,
+                                 @Argument Boolean isOfficial,
                                  @ContextValue String token
     ) throws JSONException {
         String emailFromToken = "";
