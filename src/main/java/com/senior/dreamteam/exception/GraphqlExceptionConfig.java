@@ -1,4 +1,4 @@
-package com.senior.dreamteam.configs;
+package com.senior.dreamteam.exception;
 
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;

@@ -5,7 +5,6 @@ import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.repositories.ProblemRepository;
 import com.senior.dreamteam.repositories.SubmissionRepository;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONTokener;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -79,11 +77,7 @@ public class ProblemService {
             Optional<Problem> problemOptional = problemRepository.findById(id);
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                if(jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name())) {
-                    problemRepository.deleteById(id);
-                    return "Problem removed successfully";
-                }
-                if (problemOptional.get().getUser().getEmail() == email){
+                if(jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail() == email) {
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }

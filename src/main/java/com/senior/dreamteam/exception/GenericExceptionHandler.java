@@ -1,4 +1,4 @@
-package com.senior.dreamteam.configs;
+package com.senior.dreamteam.exception;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
