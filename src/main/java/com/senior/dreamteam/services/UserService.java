@@ -116,7 +116,7 @@ public class UserService {
         try {
             Optional<User> userOptional = userRepository.findById(id);
             if (userOptional.isPresent()) {
-                if(jwtTokenUtil.isTokenValid(token, userOptional.get()) && jwtTokenUtil.isAccessToken(token))
+                if((jwtTokenUtil.isTokenValid(token, userOptional.get()) && jwtTokenUtil.isAccessToken(token)) || jwtTokenUtil.isAdminToken(token))
                 userRepository.deleteById(id);
                 return "User removed successfully";
             } else {
