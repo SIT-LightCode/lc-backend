@@ -10,6 +10,7 @@ import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.UserService;
 import com.senior.dreamteam.validation.GenericValidation;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -52,16 +53,14 @@ public class ProblemController {
                                  @NotEmpty(message = "tag id must not be empty") @Argument String arrayTagId,
                                  @NotEmpty(message = "solution must not be empty") @Argument String solution,
                                  @Argument String exampleParameter,
-                                 @Min(value = 0, message = "level must be greater than or equal to 0") @Argument int level,
-                                 @Min(value = 0, message = "total score must be greater than or equal to 0") @Argument int totalScore,
-                                 @NotEmpty(message = "solution must not be empty") @Argument Boolean isOfficial,
-                                 @ContextValue String token
+                                 @Min(value = 0, message = "level must be greater than or equal to 0") @Max(value = 5, message = "level must be lesser than or equal to 5") @Argument int level,
+                                 @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
+                                 @Argument Boolean isOfficial,
+                                 @NotEmpty(message = "Token cannot be empty") @ContextValue String token
     ) throws JSONException {
-        genericValidation.validateParameter(level, 1, 5);
-        genericValidation.validateParameter(totalScore, 1, 100);
         String emailFromToken = "";
         Boolean isAdmin = false;
-        if(!token.isEmpty()){
+        if (!token.isEmpty()) {
             emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
             isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
         }
@@ -80,6 +79,7 @@ public class ProblemController {
                 return problemService.upsertProblem(problem);
             }
         }
+        problem.setUser(userService.findUserByEmail(emailFromToken));
         problem.setName(name);
         problem.setDescription(description);
         problem.setSolution(solution);
@@ -96,15 +96,13 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")
-    public String removeProblem(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
-        genericValidation.validateIsEmptyToken(token);
+    public String removeProblem(@NotEmpty(message = "Unauthorized: Cannot remove problem") @ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         return problemService.removeProblemById(token, id);
     }
 
     @SchemaMapping(typeName = "Mutation", value = "checkAnswer")
-    public CheckAnswerResult checkAnswer(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int problemId,
+    public CheckAnswerResult checkAnswer(@NotEmpty(message = "Token cannot be empty") @ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int problemId,
                                          @NotEmpty(message = "solution must not be empty") @Argument String solution) {
-        genericValidation.validateIsEmptyToken(token);
         return problemService.checkAnswer(token, problemId, solution);
     }
 }

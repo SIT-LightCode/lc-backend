@@ -5,7 +5,6 @@ import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.repositories.ProblemRepository;
 import com.senior.dreamteam.repositories.SubmissionRepository;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONTokener;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -73,12 +71,13 @@ public class ProblemService {
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
+    @Transactional
     public String removeProblemById(String token, int id) {
         try {
             Optional<Problem> problemOptional = problemRepository.findById(id);
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                if (problemOptional.get().getUser().getEmail() == email || jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name())) {
+                if(jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail() == email) {
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
@@ -369,7 +368,14 @@ public class ProblemService {
             try {
                 User user = jwtTokenUtil.getUserFromToken(token);
                 Problem problem = problemRepository.findProblemById(problemId).get();
-                submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).code(solution).build());
+                List<Submission> submissions = submissionRepository.findByUser(user);
+                Boolean isDone = submissions.stream()
+                        .anyMatch(p -> p.getProblem().getId() == problemId);
+                if (isDone) {
+                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(0).code(solution).build());
+                } else {
+                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).code(solution).build());
+                }
             } catch (Exception e) {
                 log.error("Could not save submission: " + e.getMessage());
                 throw new DemoGraphqlException("Could not save submission: " + e.getMessage());

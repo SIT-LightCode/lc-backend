@@ -1,8 +1,5 @@
 package com.senior.dreamteam.entities;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

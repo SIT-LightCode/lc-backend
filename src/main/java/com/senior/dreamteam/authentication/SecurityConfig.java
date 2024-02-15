@@ -1,8 +1,5 @@
 package com.senior.dreamteam.authentication;
 
-import com.senior.dreamteam.authentication.JwtEntryPoint;
-import com.senior.dreamteam.authentication.JwtFilter;
-import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +27,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -50,11 +46,7 @@ public class SecurityConfig {
     };
 
     private static final String[] ACCOUNT_WHITELIST = {
-            "/api/v1/auth/details",
-            "/api/v1/auth/credentials",
             "/api/v1/auth/password",
-            "/api/v1/auth/email",
-            "/api/v1/auth/username",
             "/api/v1/auth/forget-password",
             "/api/v1/auth/refresh",
     };
@@ -67,12 +59,23 @@ public class SecurityConfig {
             "/api/v1/user/**"
     };
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern("*");
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*")); // Allow all headers
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
@@ -82,7 +85,7 @@ public class SecurityConfig {
                                 Roles.USER.name()
                         )
                         .requestMatchers(ADMIN_WHITELIST).hasAuthority(Roles.ADMIN.name())
-                        .requestMatchers(USER_WHITELIST).hasAnyAuthority(Roles.USER.name())
+                        .requestMatchers(USER_WHITELIST).hasAnyAuthority(Roles.USER.name(), Roles.ADMIN.name())
                         .anyRequest().authenticated()
                 );
         http.authenticationProvider(authenticationProvider());

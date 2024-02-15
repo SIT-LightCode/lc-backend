@@ -32,15 +32,15 @@ public class HealthCheckService {
     public StatusResponse checkDBConnection() {
         try {
             tagRepository.executeNativeQuery();
-            return new StatusResponse("LightCode DB", Status.Alive);
+            return new StatusResponse("LightCode DB", Status.ALIVE);
         } catch (Exception e) {
             log.error("Error checking LightCode DB connection", e);
-            return new StatusResponse("LightCode DB", Status.Dead);
+            return new StatusResponse("LightCode DB", Status.DEAD);
         }
     }
 
     private Status calculateOverallStatus(List<StatusResponse> statusResponses) {
-        boolean isAllAlive = statusResponses.stream().allMatch(response -> response.status() == Status.Alive);
-        return isAllAlive ? Status.Alive : Status.Dead;
+        boolean isAllAlive = statusResponses.stream().allMatch(response -> response.status() == Status.ALIVE);
+        return isAllAlive ? Status.ALIVE : Status.DEAD;
     }
 }

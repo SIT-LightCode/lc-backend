@@ -43,7 +43,7 @@ public class Problem {
 
     int totalScore;
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Submission> submission;
 
     @ManyToOne

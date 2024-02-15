@@ -76,12 +76,14 @@ public class UserService {
         if (!isAdmin) {
             if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())) {
                 log.info("Unauthorized: Cannot Update this User");
-                return UserResponse.builder().build();
+                throw new DemoGraphqlException("Unauthorized: Cannot Update this User");
             }
         }
 
         List<Authorities> authoritiesList = authoritiesRepository.findAll();
-        List<String> roleList = Arrays.asList(authorities.split(", "));
+        List<String> roleList = Arrays.stream(authorities.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
 
         boolean allRolesCorrect = roleList.stream()
                 .allMatch(role -> authoritiesList.stream()
@@ -110,10 +112,11 @@ public class UserService {
     }
 
 
-    public String removeUserById(int id) {
+    public String removeUserById(int id, String token) {
         try {
             Optional<User> userOptional = userRepository.findById(id);
             if (userOptional.isPresent()) {
+                if((jwtTokenUtil.isTokenValid(token, userOptional.get()) && jwtTokenUtil.isAccessToken(token)) || jwtTokenUtil.isAdminToken(token))
                 userRepository.deleteById(id);
                 return "User removed successfully";
             } else {
@@ -131,7 +134,7 @@ public class UserService {
             userResponse.setName(user.getName());
             userResponse.setEmail(user.getEmail());
             userResponse.setAuthorities(user.getSimpleAuthorities());
-            userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
+            userResponse.setScore(0);
             if (user.getSubmission() != null) {
                 userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
             }

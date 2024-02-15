@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeUser")
-    public String removeUser(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
-        return userService.removeUserById(id);
+    public String removeUser(@Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id, @NotEmpty(message = "Unauthorized: Cannot remove user") @ContextValue String token) {
+        return userService.removeUserById(id, token);
     }
 
     @SchemaMapping(typeName = "Query", value = "getUserByEmail")
