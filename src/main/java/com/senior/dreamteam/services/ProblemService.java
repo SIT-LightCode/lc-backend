@@ -73,6 +73,7 @@ public class ProblemService {
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
+    @Transactional
     public String removeProblemById(String token, int id) {
         try {
             Optional<Problem> problemOptional = problemRepository.findById(id);

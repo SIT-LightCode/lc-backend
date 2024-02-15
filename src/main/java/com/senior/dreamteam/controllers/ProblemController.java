@@ -96,8 +96,7 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "removeProblem")
-    public String removeProblem(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
-        genericValidation.validateIsEmptyToken(token);
+    public String removeProblem(@NotEmpty(message = "Unauthorized: Cannot remove problem") @ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int id) {
         return problemService.removeProblemById(token, id);
     }
 
