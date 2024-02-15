@@ -10,6 +10,7 @@ import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.UserService;
 import com.senior.dreamteam.validation.GenericValidation;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -52,16 +53,14 @@ public class ProblemController {
                                  @NotEmpty(message = "tag id must not be empty") @Argument String arrayTagId,
                                  @NotEmpty(message = "solution must not be empty") @Argument String solution,
                                  @Argument String exampleParameter,
-                                 @Min(value = 0, message = "level must be greater than or equal to 0") @Argument int level,
-                                 @Min(value = 0, message = "total score must be greater than or equal to 0") @Argument int totalScore,
+                                 @Min(value = 0, message = "level must be greater than or equal to 0") @Max(value = 5, message = "level must be lesser than or equal to 5") @Argument int level,
+                                 @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
                                  @NotEmpty(message = "solution must not be empty") @Argument Boolean isOfficial,
                                  @ContextValue String token
     ) throws JSONException {
-        genericValidation.validateParameter(level, 1, 5);
-        genericValidation.validateParameter(totalScore, 1, 100);
         String emailFromToken = "";
         Boolean isAdmin = false;
-        if(!token.isEmpty()){
+        if (!token.isEmpty()) {
             emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
             isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
         }

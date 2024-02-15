@@ -81,7 +81,9 @@ public class UserService {
         }
 
         List<Authorities> authoritiesList = authoritiesRepository.findAll();
-        List<String> roleList = Arrays.asList(authorities.split(", "));
+        List<String> roleList = Arrays.stream(authorities.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
 
         boolean allRolesCorrect = roleList.stream()
                 .allMatch(role -> authoritiesList.stream()
@@ -110,10 +112,11 @@ public class UserService {
     }
 
 
-    public String removeUserById(int id) {
+    public String removeUserById(int id, String token) {
         try {
             Optional<User> userOptional = userRepository.findById(id);
             if (userOptional.isPresent()) {
+                if(jwtTokenUtil.isTokenValid(token, userOptional.get()) && jwtTokenUtil.isAccessToken(token))
                 userRepository.deleteById(id);
                 return "User removed successfully";
             } else {

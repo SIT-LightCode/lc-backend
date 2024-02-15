@@ -125,6 +125,10 @@ public class JwtTokenUtil implements Serializable {
         return tokenService.findTokenByToken(token).getIsAccess();
     }
 
+    public Boolean isAdminToken(String token) throws Exception {
+        return getAuthoritiesFromToken(token).stream().anyMatch(a -> a.equals(Roles.ADMIN.name()));
+    }
+
     public Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return created.before(lastPasswordReset);
     }
