@@ -79,6 +79,7 @@ public class ProblemController {
                 return problemService.upsertProblem(problem);
             }
         }
+        problem.setUser(userService.findUserByEmail(emailFromToken));
         problem.setName(name);
         problem.setDescription(description);
         problem.setSolution(solution);
