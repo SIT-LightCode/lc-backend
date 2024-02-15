@@ -78,7 +78,11 @@ public class ProblemService {
             Optional<Problem> problemOptional = problemRepository.findById(id);
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                if (problemOptional.get().getUser().getEmail() == email || jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name())) {
+                if(jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name())) {
+                    problemRepository.deleteById(id);
+                    return "Problem removed successfully";
+                }
+                if (problemOptional.get().getUser().getEmail() == email){
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
