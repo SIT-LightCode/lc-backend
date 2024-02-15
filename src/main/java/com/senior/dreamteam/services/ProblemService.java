@@ -369,7 +369,14 @@ public class ProblemService {
             try {
                 User user = jwtTokenUtil.getUserFromToken(token);
                 Problem problem = problemRepository.findProblemById(problemId).get();
-                submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).code(solution).build());
+                List<Submission> submissions = submissionRepository.findByUser(user);
+                Boolean isDone = submissions.stream()
+                        .anyMatch(p -> p.getProblem().getId() == problemId);
+                if (isDone) {
+                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(0).code(solution).build());
+                } else {
+                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).code(solution).build());
+                }
             } catch (Exception e) {
                 log.error("Could not save submission: " + e.getMessage());
                 throw new DemoGraphqlException("Could not save submission: " + e.getMessage());
