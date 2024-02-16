@@ -56,7 +56,7 @@ public class ProblemController {
                                  @Min(value = 0, message = "level must be greater than or equal to 0") @Max(value = 5, message = "level must be lesser than or equal to 5") @Argument int level,
                                  @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
                                  @Argument Boolean isOfficial,
-                                 @ContextValue String token
+                                 @NotEmpty(message = "Token cannot be empty") @ContextValue String token
     ) throws JSONException {
         String emailFromToken = "";
         Boolean isAdmin = false;
@@ -101,9 +101,8 @@ public class ProblemController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "checkAnswer")
-    public CheckAnswerResult checkAnswer(@ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int problemId,
+    public CheckAnswerResult checkAnswer(@NotEmpty(message = "Token cannot be empty") @ContextValue String token, @Min(value = 1, message = "id must be greater than or equal to 1") @Argument int problemId,
                                          @NotEmpty(message = "solution must not be empty") @Argument String solution) {
-        genericValidation.validateIsEmptyToken(token);
         return problemService.checkAnswer(token, problemId, solution);
     }
 }

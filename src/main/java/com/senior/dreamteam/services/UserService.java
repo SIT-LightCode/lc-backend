@@ -76,7 +76,7 @@ public class UserService {
         if (!isAdmin) {
             if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())) {
                 log.info("Unauthorized: Cannot Update this User");
-                return UserResponse.builder().build();
+                throw new DemoGraphqlException("Unauthorized: Cannot Update this User");
             }
         }
 

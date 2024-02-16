@@ -1,5 +1,5 @@
 package com.senior.dreamteam.controllers.payload.utils;
 
 public enum Status {
-    Alive, Dead
+    ALIVE, DEAD
 }

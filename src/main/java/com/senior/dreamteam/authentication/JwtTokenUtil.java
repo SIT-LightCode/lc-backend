@@ -79,7 +79,7 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.parser()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 .getBody();
     }
 

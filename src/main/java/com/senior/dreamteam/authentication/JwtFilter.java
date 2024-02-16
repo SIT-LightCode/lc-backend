@@ -44,10 +44,12 @@ public class JwtFilter extends OncePerRequestFilter {
                     log.info("user {} perform some action", username);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Token is invalid");
+                    log.error("Authentication failed");
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("Authentication failed", e.getMessage());
+//                throw new DemoGraphqlException(e.getMessage());
+//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + e.getMessage());
             }
         }
         filterChain.doFilter(request, response);

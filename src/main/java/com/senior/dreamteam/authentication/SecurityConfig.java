@@ -46,11 +46,7 @@ public class SecurityConfig {
     };
 
     private static final String[] ACCOUNT_WHITELIST = {
-            "/api/v1/auth/details",
-            "/api/v1/auth/credentials",
             "/api/v1/auth/password",
-            "/api/v1/auth/email",
-            "/api/v1/auth/username",
             "/api/v1/auth/forget-password",
             "/api/v1/auth/refresh",
     };
@@ -89,7 +85,7 @@ public class SecurityConfig {
                                 Roles.USER.name()
                         )
                         .requestMatchers(ADMIN_WHITELIST).hasAuthority(Roles.ADMIN.name())
-                        .requestMatchers(USER_WHITELIST).hasAnyAuthority(Roles.USER.name())
+                        .requestMatchers(USER_WHITELIST).hasAnyAuthority(Roles.USER.name(), Roles.ADMIN.name())
                         .anyRequest().authenticated()
                 );
         http.authenticationProvider(authenticationProvider());
