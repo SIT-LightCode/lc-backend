@@ -7,59 +7,89 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor
 @Slf4j
 @ControllerAdvice
+@RestControllerAdvice
 public class GenericExceptionHandler {
 
+    @ExceptionHandler(DemoGraphqlException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(DemoGraphqlException ex) {
+        String errorMessage = ex.getMessage();
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", List.of(
+                Map.of("message", errorMessage)
+        ));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
+                .map(e -> e.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation error");
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", errorMessage);
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", List.of(
+                Map.of("message", errorMessage)
+        ));
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
         String errorMessage = ex.getReason();
-        // If there's no custom message, use a default one
         if (errorMessage == null) {
             errorMessage = "There was an error processing your request.";
         }
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", errorMessage);
-        return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
-    }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleResponseStatusException(RuntimeException ex) {
-        String errorMessage = ex.getMessage();
-        // If there's no custom message, use a default one
-        if (errorMessage == null) {
-            errorMessage = "There was an error processing your request.";
-        }
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", errorMessage);
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", List.of(
+                Map.of("message", errorMessage)
+        ));
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    //for other Exception that not specified handling
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         String errorMessage = ex.getMessage();
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", errorMessage);
+        if (errorMessage == null) {
+            errorMessage = "There was an error processing your request.";
+        }
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", List.of(
+                Map.of("message", errorMessage)
+        ));
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if (errorMessage == null) {
+            errorMessage = "There was an error processing your request.";
+        }
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", List.of(
+                Map.of("message", errorMessage)
+        ));
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
