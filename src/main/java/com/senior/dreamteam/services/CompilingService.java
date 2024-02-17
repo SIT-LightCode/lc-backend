@@ -1,6 +1,7 @@
 package com.senior.dreamteam.services;
 
 import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.model.Result;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -53,30 +54,30 @@ public class CompilingService {
         System.out.println(params); //[{"1":"asd","2":"21","3":"asd2"},{"1":"asd","2":"2","3":"aa"}]
 
         data.put("params", params);
-        System.out.println(data);
         return data;
     }
 
-    public List<String> handleResponse(String jsonResponse) {
+    public List<Result> handleResponse(String jsonResponse) {
+        List<Result> results = new ArrayList<>();
         try {
             JSONObject responseObject = new JSONObject(jsonResponse);
             JSONArray messageArray = responseObject.getJSONArray("message");
-            List<String> results = new ArrayList<>();
 
             for (int i = 0; i < messageArray.length(); i++) {
                 JSONObject messageObject = messageArray.getJSONObject(i);
-
-                // Extract the values from each "message" object
                 boolean isError = messageObject.getBoolean("isError");
                 if (isError) {
-                    String errorMessage = messageObject.isNull("errorMessage") ? null : messageObject.getString("errorMessage");
-                    throw new DemoGraphqlException("Got error from response: " + errorMessage);
+                    String errorMessage = messageObject.optString("errorMessage", null);
+                    results.add(new Result("", true));
+                } else {
+                    String result = messageObject.optString("result", null);
+                    results.add(new Result(result, false));
                 }
-                results.add(messageObject.getString("result"));
             }
-            return results;
         } catch (JSONException e) {
-            throw new DemoGraphqlException("Error parsing JSON response: " + e.getMessage());
+            // If the JSON parsing itself fails, we add a single error result.
+            results.add(new Result(null, true));
         }
+        return results;
     }
 }
