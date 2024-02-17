@@ -60,7 +60,7 @@ public class GenericExceptionHandler {
                 Map.of("message", errorMessage)
         ));
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
     }
 
     @ExceptionHandler(RuntimeException.class)

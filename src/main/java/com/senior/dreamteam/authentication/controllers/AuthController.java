@@ -7,6 +7,7 @@ import com.senior.dreamteam.authentication.payload.JwtResponse;
 import com.senior.dreamteam.authentication.payload.LoginRequest;
 import com.senior.dreamteam.entities.Token;
 import com.senior.dreamteam.entities.User;
+import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Validated @RequestBody LoginRequest login) {
-//        return ResponseEntity.ok(new JwtResponse("", ""));
         User user = loginWithEmail(login.email(), login.password());
         return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
     }
@@ -52,7 +52,7 @@ public class AuthController {
             jwtTokenUtil.revokeToken(token.refreshToken());
             return ResponseEntity.ok("token revoked");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("cannot revoke this token");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot revoke this token");
         }
     }
 
@@ -77,8 +77,12 @@ public class AuthController {
     }
 
     private User loginWithEmail(String email, String password) {
-        User user = userService.findUserByEmail(email);
-        return loginProcess(email, password, user);
+        try {
+            User user = userService.findUserByEmail(email);
+            return loginProcess(email, password, user);
+        } catch (DemoGraphqlException e) {
+            throw new DemoGraphqlException("username or password is incorrect");
+        }
     }
 
     private User loginProcess(String email, String password, User user) {

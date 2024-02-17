@@ -22,6 +22,7 @@ public class Submission {
     @ManyToOne
     Problem problem;
 
+    @Column(columnDefinition = "TEXT")
     String code;
 
     int score;

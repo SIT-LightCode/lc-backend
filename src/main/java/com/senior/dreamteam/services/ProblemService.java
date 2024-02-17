@@ -3,6 +3,7 @@ package com.senior.dreamteam.services;
 import com.senior.dreamteam.authentication.JwtTokenUtil;
 import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.model.Result;
 import com.senior.dreamteam.repositories.ProblemRepository;
 import com.senior.dreamteam.repositories.SubmissionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class ProblemService {
     @Autowired
     SubmissionRepository submissionRepository;
 
-    private final int PARAM_GENERATION_COUNT = 1500;
+    private final int PARAM_GENERATION_COUNT = 200;
     private int RANDOM_NUMBER_COUNT = 0;
 
 
@@ -67,7 +68,6 @@ public class ProblemService {
         //execute test for generatedParams
         JSONArray generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
-
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
 
@@ -77,7 +77,7 @@ public class ProblemService {
             Optional<Problem> problemOptional = problemRepository.findById(id);
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                if(jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail() == email) {
+                if (jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail() == email) {
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
@@ -168,6 +168,7 @@ public class ProblemService {
         List<Example> examples = new ArrayList<Example>();
         try {
             int batchSize = 200;
+            int numOfError = 0;
             for (int i = 0; i < testParams.length(); i += batchSize) {
                 int endIndex = Math.min(testParams.length(), i + batchSize);
                 JSONArray batchParams = new JSONArray();
@@ -176,21 +177,28 @@ public class ProblemService {
                 }
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), batchParams);
                 String returnValue = compilingService.postData(jsonBody, lang);
-                List<String> results = compilingService.handleResponse(returnValue);
+                List<Result> results = compilingService.handleResponse(returnValue);
                 for (int j = 0; j < batchParams.length(); j++) {
+                    if (results.get(j).isError()) {
+                        numOfError++;
+                        continue;
+                    }
                     if (isExample) {
                         Example example = new Example();
                         example.setProblem(problem);
                         example.setInput(batchParams.get(j).toString());
-                        example.setOutput(results.get(j));
+                        example.setOutput(results.get(j).getOutput());
                         examples.add(example);
                     } else {
                         Testcase testcase = new Testcase();
                         testcase.setProblem(problem);
                         testcase.setInput(batchParams.get(j).toString());
-                        testcase.setOutput(results.get(j));
+                        testcase.setOutput(results.get(j).getOutput());
                         testcases.add(testcase);
                     }
+                }
+                if(Math.ceil(testParams.length() * 90 / 100) < numOfError){
+                    throw new DemoGraphqlException("Cannot create wrong solution for this problem");
                 }
             }
         } catch (Exception e) {
@@ -266,115 +274,94 @@ public class ProblemService {
 
     @Transactional
     public CheckAnswerResult checkAnswer(String token, int problemId, String solution) {
-        Boolean isCorrect = true;
+        boolean isCorrect = true;
         String lang = "js";
         List<Example> exampleList = exampleService.findExamplesByProblemId(problemId);
         List<ExampleResult> exampleResult = new ArrayList<>();
+        List<TestcaseResult> testcaseResult = new ArrayList<>();
 
         // Define batch size
         int batchSize = 300;
 
-        // Execute in batches
+        // Execute in batches for examples
         for (int i = 0; i < exampleList.size(); i += batchSize) {
             int endIndex = Math.min(exampleList.size(), i + batchSize);
-
-            // Create batches for processing
             List<Example> exampleBatch = exampleList.subList(i, endIndex);
 
             try {
-                // Cast List<String> into JSONArray
                 JSONArray jsonArray = new JSONArray();
-                exampleBatch.stream().map(Example::getInput).forEach(jsonString -> {
-                    try {
-                        jsonArray.put(new JSONObject(jsonString));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                for (Example example : exampleBatch) {
+                    jsonArray.put(new JSONObject(example.getInput()));
+                }
                 JSONObject jsonBody = compilingService.createDataObject(solution, jsonArray);
                 String returnValue = compilingService.postData(jsonBody, lang);
-                List<String> results = compilingService.handleResponse(returnValue);
+                List<Result> results = compilingService.handleResponse(returnValue);
 
-                int index = 0;
-                for (Example example : exampleBatch) {
-                    String result = results.get(index);
-                    String output = example.getOutput();
+                for (int j = 0; j < exampleBatch.size(); j++) {
+                    Example example = exampleBatch.get(j);
+                    Result result = results.get(j);
 
-                    if (output.equals(result)) {
-                        exampleResult.add(new ExampleResult(example.getId(), "passed", "Expected: " + output + ", Got: " + result));
+
+                    String output = example.getOutput().trim();
+                    if (output.equals(result.getOutput().trim())) {
+                        exampleResult.add(new ExampleResult(example.getId(), "passed", ""));
                     } else {
-                        exampleResult.add(new ExampleResult(example.getId(), "failed", "Expected: " + output + ", Got: " + result));
+                        exampleResult.add(new ExampleResult(example.getId(), "failed", "Expected: " + output + ", Got: " + result.getOutput()));
                         isCorrect = false;
                     }
-                    index++;
                 }
             } catch (Exception e) {
-                throw new DemoGraphqlException("An error occurred: " + e.getMessage());
+                throw new DemoGraphqlException("An error occurred during example processing: " + e.getMessage());
             }
         }
-// Testcase part
+
+        // Same approach for testcases
         List<Testcase> testcaseList = testcaseService.findTestcasesByProblemId(problemId);
-        List<TestcaseResult> testcaseResult = new ArrayList<>();
 
         // Execute in batches for testcases
         for (int i = 0; i < testcaseList.size(); i += batchSize) {
             int endIndex = Math.min(testcaseList.size(), i + batchSize);
-
-            // Create batches for processing
             List<Testcase> testcaseBatch = testcaseList.subList(i, endIndex);
 
             try {
-                // Cast List<String> into JSONArray
                 JSONArray jsonArray = new JSONArray();
-                testcaseBatch.stream().map(Testcase::getInput).forEach(jsonString -> {
-                    try {
-                        jsonArray.put(new JSONObject(jsonString));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-
-                JSONObject jsonBody = compilingService.createDataObject(solution, jsonArray);
-
-                String returnValue = compilingService.postData(jsonBody, lang);
-                List<String> results = compilingService.handleResponse(returnValue);
-
-                int index = 0;
                 for (Testcase testcase : testcaseBatch) {
-                    String result = results.get(index);
-                    String output = testcase.getOutput();
+                    jsonArray.put(new JSONObject(testcase.getInput()));
+                }
+                JSONObject jsonBody = compilingService.createDataObject(solution, jsonArray);
+                String returnValue = compilingService.postData(jsonBody, lang);
+                List<Result> results = compilingService.handleResponse(returnValue);
 
-                    // Create TestcaseResult based on returned result
-                    if (output.equals(result)) {
+                for (int j = 0; j < testcaseBatch.size(); j++) {
+                    Testcase testcase = testcaseBatch.get(j);
+                    Result result = results.get(j);
+
+
+                    String output = testcase.getOutput().trim();
+                    if (output.equals(result.getOutput().trim())) {
                         testcaseResult.add(new TestcaseResult(testcase.getId(), "passed", ""));
                     } else {
-                        testcaseResult.add(new TestcaseResult(testcase.getId(), "failed", ""));
+                        testcaseResult.add(new TestcaseResult(testcase.getId(), "failed", "Expected: " + output + ", Got: " + result.getOutput()));
                         isCorrect = false;
                     }
-
-                    index++;
                 }
             } catch (Exception e) {
-                throw new RuntimeException("An error occurred: " + e.getMessage());
+                throw new RuntimeException("An error occurred during testcase processing: " + e.getMessage());
             }
         }
 
-        // Create a new instance of CheckAnswerResult
-        CheckAnswerResult results = new CheckAnswerResult();
-        results.setExampleResults(exampleResult);
-        results.setTestcaseResults(testcaseResult);
-
+        // Handling submissions
         if (isCorrect) {
             try {
                 User user = jwtTokenUtil.getUserFromToken(token);
                 Problem problem = problemRepository.findProblemById(problemId).get();
-                List<Submission> submissions = submissionRepository.findByUser(user);
-                Boolean isDone = submissions.stream()
-                        .anyMatch(p -> p.getProblem().getId() == problemId);
-                if (isDone) {
-                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(0).code(solution).build());
+                Boolean isNewSubmission = submissionRepository.findByUserAndProblem(user, problem).isEmpty();
+
+                if (isNewSubmission) {
+                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).build());
                 } else {
-                    submissionRepository.save(Submission.builder().user(user).problem(problem).score(problem.getTotalScore()).code(solution).build());
+                    // If not new, create a submission with a score of 0?
+                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).build());
                 }
             } catch (Exception e) {
                 log.error("Could not save submission: " + e.getMessage());
@@ -382,6 +369,7 @@ public class ProblemService {
             }
         }
 
-        return results;
+        CheckAnswerResult answerResults = new CheckAnswerResult(exampleResult, testcaseResult);
+        return answerResults;
     }
 }

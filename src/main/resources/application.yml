@@ -54,7 +54,7 @@ jwt:
 
 logging:
   file:
-    name: logs/lc_backend_log.log
+    name: logs/${ENV_LOG:local}_lc_backend_log.log
   logback:
     rollingpolicy:
       max-file-size: 10MB
