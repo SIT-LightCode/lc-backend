@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -29,6 +30,7 @@ public class GenericExceptionHandler {
     }
 
     @ExceptionHandler(ResponseStatusException.class)
+    @ResponseBody
     public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
         String errorMessage = ex.getReason();
         // If there's no custom message, use a default one
