@@ -120,10 +120,10 @@ public class UserService {
                 userRepository.deleteById(id);
                 return "User removed successfully";
             } else {
-                return "User not found with ID: " + id;
+                throw new DemoGraphqlException("User not found with id: " + id);
             }
         } catch (Exception e) {
-            return "An error occurred: " + e.getMessage();
+            throw new DemoGraphqlException(e.getMessage());
         }
     }
 
