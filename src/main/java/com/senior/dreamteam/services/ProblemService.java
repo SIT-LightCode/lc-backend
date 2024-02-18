@@ -77,10 +77,11 @@ public class ProblemService {
             Optional<Problem> problemOptional = problemRepository.findById(id);
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
-                if (jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail() == email) {
+                if (jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail().equals(email)) {
                     problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
+                log.info("This {} try to remove problem id from this {}", email, problemOptional.get().getUser().getEmail());
                 throw new DemoGraphqlException("Unable to remove problem");
             }
             return "Problem not found with ID: " + id;
