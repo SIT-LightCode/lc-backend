@@ -66,7 +66,7 @@ public class LessonController {
     @SchemaMapping(typeName = "Mutation", value = "removeLesson")
     public String removeLesson(@Min(value = 1, message = "lessonId must be greater than or equal to 1") @Argument int lessonId, @NotEmpty(message = "Token cannot be empty") @ContextValue String token) throws Exception {
         if (!jwtTokenUtil.isAdminToken(token)) {
-            log.info("Unauthorized: Cannot Update this lesson");
+            log.info("Unauthorized: Cannot remove this lesson");
             throw new DemoGraphqlException("Unauthorized: Cannot Update this lesson");
         }
         return lessonService.removeLessonById(lessonId);
