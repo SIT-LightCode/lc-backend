@@ -168,6 +168,7 @@ public class ProblemService {
         List<Example> examples = new ArrayList<Example>();
         try {
             int batchSize = 200;
+            int numOfError = 0;
             for (int i = 0; i < testParams.length(); i += batchSize) {
                 int endIndex = Math.min(testParams.length(), i + batchSize);
                 JSONArray batchParams = new JSONArray();
@@ -175,18 +176,11 @@ public class ProblemService {
                     batchParams.put(testParams.get(j));
                 }
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), batchParams);
-                if (testParams.length() == 1500) {
-                    System.out.println(jsonBody);
-                }
                 String returnValue = compilingService.postData(jsonBody, lang);
-                System.out.println("return value: " + returnValue);
-                System.out.println("jsonBody: " + jsonBody);
                 List<Result> results = compilingService.handleResponse(returnValue);
                 for (int j = 0; j < batchParams.length(); j++) {
-                    System.out.println("here");
-                    System.out.println(results.get(j).getOutput());
-                    System.out.println(results.get(j).isError());
                     if (results.get(j).isError()) {
+                        numOfError++;
                         continue;
                     }
                     if (isExample) {
@@ -202,6 +196,9 @@ public class ProblemService {
                         testcase.setOutput(results.get(j).getOutput());
                         testcases.add(testcase);
                     }
+                }
+                if(Math.ceil(testParams.length() * 90 / 100) < numOfError){
+                    throw new DemoGraphqlException("Cannot create wrong solution for this problem");
                 }
             }
         } catch (Exception e) {
