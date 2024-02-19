@@ -40,7 +40,7 @@ public class ProblemService {
     @Autowired
     SubmissionRepository submissionRepository;
 
-    private final int PARAM_GENERATION_COUNT = 200;
+    private final int PARAM_GENERATION_COUNT = 1100;
     private int RANDOM_NUMBER_COUNT = 0;
 
 
