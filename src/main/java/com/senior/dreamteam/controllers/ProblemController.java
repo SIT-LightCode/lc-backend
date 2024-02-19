@@ -51,7 +51,7 @@ public class ProblemController {
                                  @NotEmpty(message = "name must not be empty") @Argument String name,
                                  @NotEmpty(message = "description must not be empty") @Argument String description,
                                  @NotEmpty(message = "tag id must not be empty") @Argument String arrayTagId,
-                                 @NotEmpty(message = "solution must not be empty") @Argument String solution,
+                                 @Argument String solution,
                                  @Argument String exampleParameter,
                                  @Min(value = 0, message = "level must be greater than or equal to 0") @Max(value = 5, message = "level must be lesser than or equal to 5") @Argument int level,
                                  @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
@@ -79,6 +79,7 @@ public class ProblemController {
                 return problemService.upsertProblem(problem);
             }
         }
+        genericValidation.validateParameter(solution,1, Integer.MAX_VALUE);
         problem.setUser(userService.findUserByEmail(emailFromToken));
         problem.setName(name);
         problem.setDescription(description);
