@@ -301,8 +301,9 @@ public class ProblemService {
                 for (int j = 0; j < exampleBatch.size(); j++) {
                     Example example = exampleBatch.get(j);
                     Result result = results.get(j);
-
-
+                    if (result.isError()) {
+                        throw new DemoGraphqlException("There was some error with your code");
+                    }
                     String output = example.getOutput().trim();
                     if (output.equals(result.getOutput().trim())) {
                         exampleResult.add(new ExampleResult(example.getId(), "passed", ""));
