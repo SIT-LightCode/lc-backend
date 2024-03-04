@@ -26,4 +26,5 @@ public class Submission {
     String code;
 
     int score;
+    int scoreUnOfficial;
 }

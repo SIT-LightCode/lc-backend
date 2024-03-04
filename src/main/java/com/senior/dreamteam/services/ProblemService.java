@@ -360,10 +360,14 @@ public class ProblemService {
                 Boolean isNewSubmission = submissionRepository.findByUserAndProblem(user, problem).isEmpty();
 
                 if (isNewSubmission) {
-                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).build());
+                    if(problem.getIsOfficial()){
+                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
+                    } else {
+                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
+                    }
                 } else {
                     // If not new, create a submission with a score of 0?
-                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).build());
+                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                 }
             } catch (Exception e) {
                 log.error("Could not save submission: " + e.getMessage());

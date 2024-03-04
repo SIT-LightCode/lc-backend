@@ -135,8 +135,10 @@ public class UserService {
             userResponse.setEmail(user.getEmail());
             userResponse.setAuthorities(user.getSimpleAuthorities());
             userResponse.setScore(0);
+            userResponse.setScoreUnOfficial(0);
             if (user.getSubmission() != null) {
                 userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
+                userResponse.setScoreUnOfficial(user.getSubmission().stream().mapToInt(Submission::getScoreUnOfficial).sum());
             }
             return userResponse;
         } catch (Exception e) {
