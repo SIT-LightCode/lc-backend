@@ -5,6 +5,8 @@ import com.senior.dreamteam.authentication.JwtTokenUtil;
 import com.senior.dreamteam.authentication.payload.JwtRequest;
 import com.senior.dreamteam.authentication.payload.JwtResponse;
 import com.senior.dreamteam.authentication.payload.LoginRequest;
+import com.senior.dreamteam.authentication.payload.RegisterRequest;
+import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.Token;
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.exception.DemoGraphqlException;
@@ -43,6 +45,11 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@Validated @RequestBody LoginRequest login) {
         User user = loginWithEmail(login.email(), login.password());
         return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), createToken(user, ONE_WEEK, false)));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@Validated @RequestBody RegisterRequest regis) {
+        return ResponseEntity.ok(userService.addUser(regis.name(), regis.email(), regis.password()));
     }
 
     @PostMapping("/logout")

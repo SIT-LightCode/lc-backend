@@ -40,7 +40,7 @@ public class SecurityConfig {
 
     private static final String[] FREE_AREA = {
             "/playground",
-            "/api/graphql",
+//            "/api/graphql",
             "/api/v1/auth/**",
             "/api/v1/details"
     };
@@ -49,6 +49,7 @@ public class SecurityConfig {
             "/api/v1/auth/password",
             "/api/v1/auth/forget-password",
             "/api/v1/auth/refresh",
+            "/api/graphql"
     };
 
     private static final String[] ADMIN_WHITELIST = {

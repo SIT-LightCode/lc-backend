@@ -40,6 +40,7 @@ public class UserController {
     public UserResponse upsertUser(@Argument Integer id, @Argument String authorities, @NotEmpty(message = "name must not be empty") @Argument String name, @Email(message = "email must be correctly format") @Argument String email, @Argument String password, @ContextValue String token) {
         if (id == null) {
             // add user
+            // no need la
             return userService.addUser(name, email, password);
         }
         // update user
