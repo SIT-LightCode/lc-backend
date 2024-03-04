@@ -49,7 +49,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Validated @RequestBody RegisterRequest regis) {
-        return ResponseEntity.ok(userService.addUser(regis.name(), regis.email(), regis.password()));
+        return ResponseEntity.status(201).body(userService.addUser(regis.name(), regis.email(), regis.password()));
     }
 
     @PostMapping("/logout")
