@@ -64,6 +64,7 @@ logging:
     org:
       springframework:
         web: DEBUG
+        security: DEBUG
     com:
       senior:
         dreamteam: INFO

@@ -40,7 +40,8 @@ public class SecurityConfig {
 
     private static final String[] FREE_AREA = {
             "/playground",
-//            "/api/graphql",
+            "/api/graphql",
+            "/api/v1/auth/refresh",
             "/api/v1/auth/**",
             "/api/v1/details"
     };
@@ -48,8 +49,8 @@ public class SecurityConfig {
     private static final String[] ACCOUNT_WHITELIST = {
             "/api/v1/auth/password",
             "/api/v1/auth/forget-password",
-            "/api/v1/auth/refresh",
-            "/api/graphql"
+//            "/api/v1/auth/refresh",
+//            "/api/graphql"
     };
 
     private static final String[] ADMIN_WHITELIST = {
@@ -74,6 +75,7 @@ public class SecurityConfig {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("filterChain");
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
