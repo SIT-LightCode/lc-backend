@@ -136,6 +136,7 @@ public class UserService {
             userResponse.setAuthorities(user.getSimpleAuthorities());
             userResponse.setScore(0);
             userResponse.setScoreUnOfficial(0);
+            userResponse.setSkills(user.getSkill());
             if (user.getSubmission() != null) {
                 userResponse.setScore(user.getSubmission().stream().mapToInt(Submission::getScore).sum());
                 userResponse.setScoreUnOfficial(user.getSubmission().stream().mapToInt(Submission::getScoreUnOfficial).sum());

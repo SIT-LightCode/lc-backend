@@ -1,5 +1,6 @@
 package com.senior.dreamteam.controllers.payload;
 
+import com.senior.dreamteam.entities.Skill;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class UserResponse {
     private List<String> authorities;
     private int score;
     private int scoreUnOfficial;
+    private List<Skill> skills;
 }
