@@ -387,12 +387,18 @@ public class ProblemService {
                         }
                         user.setSkill(userSkills);
                     }
+
                     if (isNewSubmission) {
                         //save submission
                         submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
                     } else {
-                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
+                        // If not new, create a submission with a score of 0?
+                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                     }
+                }
+                if (isNewSubmission) {
+                    //save submission
+                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
                 } else {
                     // If not new, create a submission with a score of 0?
                     submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
