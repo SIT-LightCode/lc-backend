@@ -30,4 +30,7 @@ public class Tag {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     List<Lesson> lesson;
 
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    List<Skill> skill;
+
 }

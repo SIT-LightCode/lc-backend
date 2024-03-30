@@ -16,10 +16,12 @@ public class Skill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @OneToOne
-    EnumSkill enumSkill;
+    //    @OneToOne
+    //    EnumSkill enumSkill;
+    @ManyToOne
+    Tag tag;
 
-    Boolean isPassed;
+    Integer level;
 
     @ManyToOne
     User user;
