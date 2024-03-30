@@ -358,40 +358,38 @@ public class ProblemService {
                 User user = jwtTokenUtil.getUserFromToken(token);
                 Problem problem = problemRepository.findProblemById(problemId).get();
                 Boolean isNewSubmission = submissionRepository.findByUserAndProblem(user, problem).isEmpty();
-
-                if (isNewSubmission) {
-                    if (problem.getIsOfficial()) {
-                        //add skill if it news
-                        List<Skill> userSkills = user.getSkill();
-                        List<TagProblem> tagProblems = problem.getTagProblem();
-                        int levelProblem = problem.getLevel();
-                        for (TagProblem tagProblem : tagProblems) {
-                            Tag tag = tagProblem.getTag();
-                            boolean foundSkillToUpdate = false;
-                            for (Skill userSkill : userSkills) {
-                                if (tag.getId() == userSkill.getTag().getId()) {
-                                    foundSkillToUpdate = true;
-                                    if (levelProblem > userSkill.getLevel()) {
-                                        userSkill.setLevel(levelProblem);
-                                        userSkills.set(userSkills.indexOf(userSkill), userSkill);
-                                    }
-                                    break;
+                if (problem.getIsOfficial()) {
+                    //add skill if it news
+                    List<Skill> userSkills = user.getSkill();
+                    List<TagProblem> tagProblems = problem.getTagProblem();
+                    int levelProblem = problem.getLevel();
+                    for (TagProblem tagProblem : tagProblems) {
+                        Tag tag = tagProblem.getTag();
+                        boolean foundSkillToUpdate = false;
+                        for (Skill userSkill : userSkills) {
+                            if (tag.getId() == userSkill.getTag().getId()) {
+                                foundSkillToUpdate = true;
+                                if (levelProblem > userSkill.getLevel()) {
+                                    userSkill.setLevel(levelProblem);
+                                    userSkills.set(userSkills.indexOf(userSkill), userSkill);
                                 }
-                            }
-                            // If the skill for the tag was not found in the user's skill list, add it
-                            if (!foundSkillToUpdate) {
-                                Skill newSkill = Skill.builder()
-                                        .tag(tag)
-                                        .level(levelProblem)
-                                        .user(user)
-                                        .build();
-                                userSkills.add(newSkill);
+                                break;
                             }
                         }
+                        // If the skill for the tag was not found in the user's skill list, add it
+                        if (!foundSkillToUpdate) {
+                            Skill newSkill = Skill.builder()
+                                    .tag(tag)
+                                    .level(levelProblem)
+                                    .user(user)
+                                    .build();
+                            userSkills.add(newSkill);
+                        }
                         user.setSkill(userSkills);
+                    }
+                    if (isNewSubmission) {
                         //save submission
                         submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
-
                     } else {
                         submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
                     }
@@ -400,8 +398,8 @@ public class ProblemService {
                     submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                 }
             } catch (Exception e) {
-                log.error("Could not save submission: " + e.getMessage());
-                throw new DemoGraphqlException("Could not save submission: " + e.getMessage());
+                log.error("Could not handling submission: " + e.getMessage());
+                throw new DemoGraphqlException("Could not handling submission: " + e.getMessage());
             }
         }
 
