@@ -119,6 +119,8 @@ public class UserService {
                 if ((jwtTokenUtil.isTokenValid(token, userOptional.get()) && jwtTokenUtil.isAccessToken(token)) && jwtTokenUtil.isAdminToken(token)) {
                     userRepository.deleteById(id);
                     return "User removed successfully";
+                } else {
+                    throw new DemoGraphqlException("You have no permission");
                 }
             } else {
                 throw new DemoGraphqlException("User not found with id: " + id);
