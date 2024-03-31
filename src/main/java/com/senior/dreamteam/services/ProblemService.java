@@ -66,10 +66,7 @@ public class ProblemService {
         executeAndSaveTest(problemSaved, exampleParametersArray, lang, isExample);
 
         //execute test for generatedParams
-        System.out.println("here");
-        System.out.println(exampleParametersArray.getJSONObject(0));
         JSONArray generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
-        System.out.println(generatedParams.toString());
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }

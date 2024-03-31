@@ -51,8 +51,6 @@ public class CompilingService {
 //                paramsArray.put(obj);
 //            }
 //        }
-        System.out.println("params");
-        System.out.println(params); //[{"1":"asd","2":"21","3":"asd2"},{"1":"asd","2":"2","3":"aa"}]
 
         data.put("params", params);
         return data;
