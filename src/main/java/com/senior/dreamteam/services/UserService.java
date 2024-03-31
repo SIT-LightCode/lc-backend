@@ -69,7 +69,8 @@ public class UserService {
     public UserResponse updateUser(String emailFromToken, int id, String authorities, String name, String email) {
         User userFromToken = userRepository.findUserByEmail(emailFromToken).orElseThrow(() -> new DemoGraphqlException("This user not found"));
         User userFromId = userRepository.findUserById(id).orElseThrow(() -> new DemoGraphqlException("This user not found"));
-        if (!userRepository.findUserByEmail(email).isEmpty()) {
+        Optional<User> emailUser = userRepository.findUserByEmail(email);
+        if (!emailUser.isEmpty() || !emailUser.get().equals(email)) {
             throw new DemoGraphqlException("This email have already registered");
         }
 
