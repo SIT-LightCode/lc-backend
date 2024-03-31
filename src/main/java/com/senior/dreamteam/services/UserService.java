@@ -69,12 +69,15 @@ public class UserService {
     public UserResponse updateUser(String emailFromToken, int id, String authorities, String name, String email) {
         User userFromToken = userRepository.findUserByEmail(emailFromToken).orElseThrow(() -> new DemoGraphqlException("This user not found"));
         User userFromId = userRepository.findUserById(id).orElseThrow(() -> new DemoGraphqlException("This user not found"));
+        if (!userRepository.findUserByEmail(email).isEmpty()) {
+            throw new DemoGraphqlException("This email have already registered");
+        }
 
         boolean isAdmin = userFromToken.getAuthorities()
                 .stream()
                 .anyMatch(authority -> Roles.ADMIN.toString().equalsIgnoreCase(authority.getAuthority()));
         if (!isAdmin) {
-            if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.toString())) {
+            if (!userFromId.getUsername().equals(userFromToken.getUsername()) || authorities.contains(Roles.ADMIN.name())) {
                 log.info("Unauthorized: Cannot Update this User");
                 throw new DemoGraphqlException("Unauthorized: Cannot Update this User");
             }
