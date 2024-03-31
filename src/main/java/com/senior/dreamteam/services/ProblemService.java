@@ -66,7 +66,10 @@ public class ProblemService {
         executeAndSaveTest(problemSaved, exampleParametersArray, lang, isExample);
 
         //execute test for generatedParams
+        System.out.println("here");
+        System.out.println(exampleParametersArray.getJSONObject(0));
         JSONArray generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
+        System.out.println(generatedParams.toString());
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
         return problemRepository.findProblemById(problemSaved.getId()).get();
     }
@@ -233,7 +236,7 @@ public class ProblemService {
                 Object element = jsonArray.get(i);
                 newArray.put(generateNewValue(element));
             }
-            return newArray.toString();
+            return newArray;
         } else if (param instanceof JSONObject jsonObject) {
             JSONObject newObject = new JSONObject();
             Iterator<String> keys = jsonObject.keys();
@@ -242,7 +245,7 @@ public class ProblemService {
                 Object value = jsonObject.get(key);
                 newObject.put(key, generateNewValue(value));
             }
-            return newObject.toString();
+            return newObject;
         } else if (param instanceof Number) {
             return generateRandomNumber();
         } else if (param instanceof String) {
@@ -292,9 +295,12 @@ public class ProblemService {
             try {
                 JSONArray jsonArray = new JSONArray();
                 for (Example example : exampleBatch) {
+                    System.out.println(example.getInput());
+
                     jsonArray.put(new JSONObject(example.getInput()));
                 }
                 JSONObject jsonBody = compilingService.createDataObject(solution, jsonArray);
+                System.out.println(jsonBody);
                 String returnValue = compilingService.postData(jsonBody, lang);
                 List<Result> results = compilingService.handleResponse(returnValue);
 
