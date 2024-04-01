@@ -73,7 +73,7 @@ public class ProblemController {
                 problem.setTotalScore(totalScore);
                 problem.setLevel(level);
                 if (isAdmin) {
-                    problem.setIsOfficial(isOfficial);
+                    problem.setIsOfficial(isAdmin);
                 }
                 tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(problem, arrayTagId);
                 return problemService.upsertProblem(problem);
