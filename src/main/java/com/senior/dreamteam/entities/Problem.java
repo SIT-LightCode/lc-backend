@@ -43,6 +43,9 @@ public class Problem {
 
     int totalScore;
 
+    @Builder.Default
+    Boolean enables = true;
+
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Submission> submission;
 

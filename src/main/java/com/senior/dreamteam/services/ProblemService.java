@@ -45,11 +45,11 @@ public class ProblemService {
 
 
     public List<Problem> findAll() {
-        return problemRepository.findAll();
+        return problemRepository.findByEnableTrue();
     }
 
     public Optional<Problem> findAllById(int id) {
-        return problemRepository.findProblemById(id);
+        return problemRepository.findProblemByIdAndEnableTrue(id);
     }
 
     @Transactional
@@ -68,7 +68,7 @@ public class ProblemService {
         //execute test for generatedParams
         JSONArray generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
-        return problemRepository.findProblemById(problemSaved.getId()).get();
+        return problemRepository.findProblemByIdAndEnableTrue(problemSaved.getId()).get();
     }
 
     @Transactional
@@ -78,7 +78,8 @@ public class ProblemService {
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (problemOptional.isPresent()) {
                 if (jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name()) || problemOptional.get().getUser().getEmail().equals(email)) {
-                    problemRepository.deleteById(id);
+                    problemRepository.disableProblemById(id);
+//                    problemRepository.deleteById(id);
                     return "Problem removed successfully";
                 }
                 log.info("This {} try to remove problem id from this {}", email, problemOptional.get().getUser().getEmail());
@@ -360,7 +361,7 @@ public class ProblemService {
             try {
                 Submission submission = new Submission();
                 User user = jwtTokenUtil.getUserFromToken(token);
-                Problem problem = problemRepository.findProblemById(problemId).get();
+                Problem problem = problemRepository.findProblemByIdAndEnableTrue(problemId).get();
                 submission.setProblem(problem);
                 submission.setUser(user);
                 submission.setCode(solution);
