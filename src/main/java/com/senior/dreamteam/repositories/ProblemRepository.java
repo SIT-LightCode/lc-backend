@@ -15,8 +15,8 @@ public interface ProblemRepository extends JpaRepository<Problem, Integer> {
 //    List<Problem> findAll();
 //    Optional<Problem> findProblemById(int id);
 
-    List<Problem> findByEnableTrue();
-    Optional<Problem> findProblemByIdAndEnableTrue(int id);
+    List<Problem> findByEnablesTrue();
+    Optional<Problem> findProblemByIdAndEnablesTrue(int id);
 
     @Transactional
     @Modifying

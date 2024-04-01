@@ -45,11 +45,11 @@ public class ProblemService {
 
 
     public List<Problem> findAll() {
-        return problemRepository.findByEnableTrue();
+        return problemRepository.findByEnablesTrue();
     }
 
     public Optional<Problem> findAllById(int id) {
-        return problemRepository.findProblemByIdAndEnableTrue(id);
+        return problemRepository.findProblemByIdAndEnablesTrue(id);
     }
 
     @Transactional
@@ -68,7 +68,7 @@ public class ProblemService {
         //execute test for generatedParams
         JSONArray generatedParams = generateParameters(exampleParametersArray.getJSONObject(0), PARAM_GENERATION_COUNT);
         executeAndSaveTest(problemSaved, generatedParams, lang, !isExample);
-        return problemRepository.findProblemByIdAndEnableTrue(problemSaved.getId()).get();
+        return problemRepository.findProblemByIdAndEnablesTrue(problemSaved.getId()).get();
     }
 
     @Transactional
@@ -361,7 +361,7 @@ public class ProblemService {
             try {
                 Submission submission = new Submission();
                 User user = jwtTokenUtil.getUserFromToken(token);
-                Problem problem = problemRepository.findProblemByIdAndEnableTrue(problemId).get();
+                Problem problem = problemRepository.findProblemByIdAndEnablesTrue(problemId).get();
                 submission.setProblem(problem);
                 submission.setUser(user);
                 submission.setCode(solution);
