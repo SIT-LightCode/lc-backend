@@ -70,8 +70,10 @@ public class UserService {
         User userFromToken = userRepository.findUserByEmail(emailFromToken).orElseThrow(() -> new DemoGraphqlException("This user not found"));
         User userFromId = userRepository.findUserById(id).orElseThrow(() -> new DemoGraphqlException("This user not found"));
         Optional<User> emailUser = userRepository.findUserByEmail(email);
-        if (!emailUser.isEmpty() && !emailUser.get().equals(email)) {
-            throw new DemoGraphqlException("This email have already registered");
+        if (!emailUser.isEmpty()) {
+            if (!userFromToken.getEmail().equals(email)) {
+                throw new DemoGraphqlException("This email have already registered");
+            }
         }
 
         boolean isAdmin = userFromToken.getAuthorities()
