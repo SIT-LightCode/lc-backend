@@ -358,8 +358,12 @@ public class ProblemService {
         // Handling submissions
         if (isCorrect) {
             try {
+                Submission submission = new Submission();
                 User user = jwtTokenUtil.getUserFromToken(token);
                 Problem problem = problemRepository.findProblemById(problemId).get();
+                submission.setProblem(problem);
+                submission.setUser(user);
+                submission.setCode(solution);
                 Boolean isNewSubmission = submissionRepository.findByUserAndProblem(user, problem).isEmpty();
                 if (problem.getIsOfficial()) {
                     //add skill if it news
@@ -393,18 +397,30 @@ public class ProblemService {
 
                     if (isNewSubmission) {
                         //save submission
-                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
+                        submission.setScore(problem.getTotalScore());
+                        submission.setScoreUnOfficial(0);
+                        submissionRepository.save(submission);
+//                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
                     } else {
                         // If not new, create a submission with a score of 0?
-                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
+                        submission.setScore(0);
+                        submission.setScoreUnOfficial(0);
+                        submissionRepository.save(submission);
+//                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                     }
                 }
                 if (isNewSubmission) {
                     //save submission
-                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
+                    submission.setScore(0);
+                    submission.setScoreUnOfficial(problem.getTotalScore());
+                    submissionRepository.save(submission);
+//                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
                 } else {
                     // If not new, create a submission with a score of 0?
-                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
+                    submission.setScore(0);
+                    submission.setScoreUnOfficial(0);
+                    submissionRepository.save(submission);
+//                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                 }
             } catch (Exception e) {
                 log.error("Could not handling submission: " + e.getMessage());
