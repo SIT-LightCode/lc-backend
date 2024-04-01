@@ -57,12 +57,12 @@ public class ProblemController {
                                  @Min(value = 0, message = "total score must be greater than or equal to 0") @Max(value = 100, message = "total score must be lesser than or equal to 100") @Argument int totalScore,
                                  @Argument Boolean isOfficial,
                                  @NotEmpty(message = "Token cannot be empty") @ContextValue String token
-    ) throws JSONException {
+    ) throws Exception {
         String emailFromToken = "";
         Boolean isAdmin = false;
         if (!token.isEmpty()) {
             emailFromToken = jwtTokenUtil.getUsernameFromToken(token);
-            isAdmin = jwtTokenUtil.getAuthoritiesFromToken(token).contains(Roles.ADMIN.name());
+            isAdmin = jwtTokenUtil.isAdminToken(token);
         }
         Problem problem = new Problem();
         if (id != null) {
