@@ -364,7 +364,7 @@ public class ProblemService {
                 submission.setProblem(problem);
                 submission.setUser(user);
                 submission.setCode(solution);
-                Boolean isNewSubmission = submissionRepository.findByUserAndProblem(user, problem).isEmpty();
+                Boolean isNewSubmission = submissionRepository.findFirstByUserAndProblem(user, problem).isEmpty();
                 if (problem.getIsOfficial()) {
                     //add skill if it news
                     List<Skill> userSkills = user.getSkill();

@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface SubmissionRepository extends JpaRepository<Submission, Integer> {
     List<Submission> findByUser(User user);
 
-    Optional<Submission> findByUserAndProblem(User user, Problem problem);
+//    Optional<Submission> findByUserAndProblem(User user, Problem problem);
+    Optional<Submission> findFirstByUserAndProblem(User user, Problem problem);
+
 }
