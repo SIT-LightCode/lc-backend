@@ -404,9 +404,10 @@ public class ProblemService {
 //                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(problem.getTotalScore()).scoreUnOfficial(0).build());
                     } else {
                         // If not new, create a submission with a score of 0?
-                        submission.setScore(0);
-                        submission.setScoreUnOfficial(0);
-                        submissionRepository.save(submission);
+                        // do nothing
+//                        submission.setScore(0);
+//                        submission.setScoreUnOfficial(0);
+//                        submissionRepository.save(submission);
 //                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                     }
                 }
@@ -418,9 +419,10 @@ public class ProblemService {
 //                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(problem.getTotalScore()).build());
                 } else {
                     // If not new, create a submission with a score of 0?
-                    submission.setScore(0);
-                    submission.setScoreUnOfficial(0);
-                    submissionRepository.save(submission);
+                    // do nothing
+//                    submission.setScore(0);
+//                    submission.setScoreUnOfficial(0);
+//                    submissionRepository.save(submission);
 //                    submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                 }
             } catch (Exception e) {

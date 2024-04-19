@@ -89,7 +89,7 @@ public class ProblemController {
         problem.setLevel(level);
         problem.setIsOfficial(false);
         if (isAdmin) {
-            problem.setIsOfficial(isOfficial);
+            problem.setIsOfficial(isAdmin);
         }
         Problem result = problemService.upsertProblem(problem);
         tagProblemService.upsertMultiTagProblemByProblemAndArrTagId(result, arrayTagId);
