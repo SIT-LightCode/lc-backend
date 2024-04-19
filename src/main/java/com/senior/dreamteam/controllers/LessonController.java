@@ -39,7 +39,7 @@ public class LessonController {
     }
 
     @SchemaMapping(typeName = "Query", value = "getLessonByTagId")
-    public List<Lesson> findAllByTag_Id(@Min(value = 1, message = "userId must be greater than or equal to 1") int id) {
+    public List<Lesson> findAllByTag_Id(@Min(value = 1, message = "userId must be greater than or equal to 1") @Argument int id) {
         try {
             return lessonService.findAllByTagId(id);
         } catch (NumberFormatException e) {
