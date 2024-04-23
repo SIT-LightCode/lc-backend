@@ -1,8 +1,8 @@
 package com.senior.dreamteam.controllers;
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.controllers.payload.UserLeaderboardResponse;
 import com.senior.dreamteam.controllers.payload.UserResponse;
-import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.services.ProblemService;
 import com.senior.dreamteam.services.TagService;
 import com.senior.dreamteam.services.TagProblemService;
@@ -33,6 +33,7 @@ public class UserController {
 
     @SchemaMapping(typeName = "Query", value = "getUser")
     public List<UserResponse> findAll() {
+        userService.getLeaderboard();
         return userService.findAll();
     }
 
@@ -57,6 +58,11 @@ public class UserController {
     @SchemaMapping(typeName = "Query", value = "getUserByEmail")
     public UserResponse getUserByEmail(@Email(message = "email must be correctly format") @Argument String email) {
         return userService.getUserByEmail(email);
+    }
+
+    @SchemaMapping(typeName = "Query", value = "getLeaderboard")
+    public List<UserLeaderboardResponse> getLeaderboard() {
+        return userService.getLeaderboard();
     }
 
 }

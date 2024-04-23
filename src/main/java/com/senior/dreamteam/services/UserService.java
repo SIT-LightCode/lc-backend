@@ -1,6 +1,7 @@
 package com.senior.dreamteam.services;
 
 import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.controllers.payload.UserLeaderboardResponse;
 import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
@@ -45,6 +46,18 @@ public class UserService {
 
     public UserResponse getUserByEmail(String email) {
         return mapUserToUserResponse(userRepository.findUserByEmail(email).orElseThrow(() -> new DemoGraphqlException("This user not found")));
+    }
+
+    public List<UserLeaderboardResponse> getLeaderboard() {
+        List<Object[]> queryResult = userRepository.findUserDetailsWithSubmissions();
+        return queryResult.stream().map(result -> {
+            UserLeaderboardResponse response = new UserLeaderboardResponse();
+            response.setId(((Number) result[0]).longValue());
+            response.setName((String) result[1]);
+            response.setEmail((String) result[2]);
+            response.setScore(((Number) result[3]).intValue());
+            return response;
+        }).collect(Collectors.toList());
     }
 
     public User findUserByEmail(String email) {

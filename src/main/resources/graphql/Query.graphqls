@@ -17,4 +17,6 @@ type Query {
     getAuthorities: [Authorities]
     getAuthoritiesByUserId(userId: ID!): [Authorities]
 
+    getLeaderboard: [UserLeaderboardResponse]
+
 }
