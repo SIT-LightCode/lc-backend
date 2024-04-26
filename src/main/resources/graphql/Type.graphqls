@@ -114,3 +114,10 @@ type UserResponse {
     scoreUnOfficial: Int
     skills: [Skill]
 }
+
+type UserLeaderboardResponse {
+    id: Int
+    name: String
+    email: String
+    score: Int
+}
