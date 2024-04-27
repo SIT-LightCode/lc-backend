@@ -411,7 +411,7 @@ public class ProblemService {
 //                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                     }
                 }
-                if (isNewSubmission) {
+                else if (isNewSubmission) {
                     //save submission
                     submission.setScore(0);
                     submission.setScoreUnOfficial(problem.getTotalScore());
