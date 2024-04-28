@@ -85,7 +85,9 @@ public class UserService {
         Optional<User> emailUser = userRepository.findUserByEmail(email);
         if (!emailUser.isEmpty()) {
             if (!emailFromToken.equals(email)) {
-                throw new DemoGraphqlException("This email have already registered");
+                if (id != emailUser.get().getId()) {
+                    throw new DemoGraphqlException("This email have already registered");
+                }
             }
         }
 
