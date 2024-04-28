@@ -40,7 +40,7 @@ public class ProblemService {
     @Autowired
     SubmissionRepository submissionRepository;
 
-    private final int PARAM_GENERATION_COUNT = 700;
+    private final int PARAM_GENERATION_COUNT = 300;
     private int RANDOM_NUMBER_COUNT = 0;
 
 
@@ -61,7 +61,8 @@ public class ProblemService {
         Boolean isExample = true;
         Problem problemSaved = problemRepository.save(problem);
         JSONArray exampleParametersArray = new JSONArray(problem.getExampleParameter());
-
+        System.out.println("exam params");
+        System.out.println(exampleParametersArray.toString());
         //execute test for exampleParams
         executeAndSaveTest(problemSaved, exampleParametersArray, lang, isExample);
 
@@ -178,6 +179,8 @@ public class ProblemService {
                     batchParams.put(testParams.get(j));
                 }
                 JSONObject jsonBody = compilingService.createDataObject(problem.getSolution(), batchParams);
+                System.out.println("jsonbody");
+                System.out.println(jsonBody);
                 String returnValue = compilingService.postData(jsonBody, lang);
                 List<Result> results = compilingService.handleResponse(returnValue);
                 for (int j = 0; j < batchParams.length(); j++) {
@@ -257,18 +260,19 @@ public class ProblemService {
         List<Integer> specialNumbers = Arrays.asList(0, 1, -1, Integer.MAX_VALUE, Integer.MIN_VALUE);
         Random random = new Random();
         int bound;
-        if (RANDOM_NUMBER_COUNT < 200) {
-            bound = 10;
-        } else if (RANDOM_NUMBER_COUNT < 500) {
+        if (RANDOM_NUMBER_COUNT < 100) {
+            bound = 20;
+        } else if (RANDOM_NUMBER_COUNT < 200) {
             bound = 50;
-        } else if (RANDOM_NUMBER_COUNT < 1000) {
+        } else if (RANDOM_NUMBER_COUNT < 250) {
             bound = 100;
         } else {
             bound = 150;
         }
         RANDOM_NUMBER_COUNT++;
         if (random.nextBoolean()) {
-            return specialNumbers.get(random.nextInt(specialNumbers.size()));
+//            return specialNumbers.get(random.nextInt(specialNumbers.size()));
+            return random.nextInt(bound) - bound / 2;
         } else {
             return random.nextInt(bound) - bound / 2;
         }
@@ -410,8 +414,7 @@ public class ProblemService {
 //                        submissionRepository.save(submission);
 //                        submissionRepository.save(Submission.builder().problem(problem).user(user).code(solution).score(0).scoreUnOfficial(0).build());
                     }
-                }
-                else if (isNewSubmission) {
+                } else if (isNewSubmission) {
                     //save submission
                     submission.setScore(0);
                     submission.setScoreUnOfficial(problem.getTotalScore());
