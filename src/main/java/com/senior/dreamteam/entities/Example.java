@@ -17,6 +17,8 @@ public class Example {
     int id;
 
     String input;
+
+    @Column(columnDefinition = "TEXT")
     String output;
 
     @ManyToOne
