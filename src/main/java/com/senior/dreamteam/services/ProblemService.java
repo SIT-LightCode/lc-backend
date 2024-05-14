@@ -1,6 +1,6 @@
 package com.senior.dreamteam.services;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.entities.*;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.model.Result;

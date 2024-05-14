@@ -1,8 +1,6 @@
 package com.senior.dreamteam.controllers;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
-import com.senior.dreamteam.entities.Roles;
-import com.senior.dreamteam.exception.DemoGraphqlException;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.services.TagProblemService;
 import com.senior.dreamteam.entities.CheckAnswerResult;
 import com.senior.dreamteam.entities.Problem;
@@ -15,8 +13,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;

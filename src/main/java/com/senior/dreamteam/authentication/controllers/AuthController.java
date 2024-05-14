@@ -1,13 +1,9 @@
 package com.senior.dreamteam.authentication.controllers;
 
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
-import com.senior.dreamteam.authentication.payload.JwtRequest;
-import com.senior.dreamteam.authentication.payload.JwtResponse;
-import com.senior.dreamteam.authentication.payload.LoginRequest;
-import com.senior.dreamteam.authentication.payload.RegisterRequest;
+import com.senior.dreamteam.authentication.payload.*;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.controllers.payload.UserResponse;
-import com.senior.dreamteam.entities.Token;
 import com.senior.dreamteam.entities.User;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.services.UserService;
@@ -25,8 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -71,6 +65,17 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(createToken(user, ONE_DAY, true), token.token()));
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot refresh token");
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<String> changePassword(@Validated @RequestBody ChangePasswordRequest login) throws Exception {
+        try {
+            User user = loginWithEmail(login.email(), login.password());
+            userService.changeUserPassword(user, login.newPassword());
+            return ResponseEntity.ok("Password Changed");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update password");
+        }
     }
 
     private String createToken(User user, Long expiration, boolean isAccess) {

@@ -1,7 +1,7 @@
-package com.senior.dreamteam.authentication;
+package com.senior.dreamteam.authentication.services;
 
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.entities.User;
-import com.senior.dreamteam.exception.DemoGraphqlException;
 import com.senior.dreamteam.services.TokenService;
 import com.senior.dreamteam.services.UserService;
 import jakarta.servlet.FilterChain;

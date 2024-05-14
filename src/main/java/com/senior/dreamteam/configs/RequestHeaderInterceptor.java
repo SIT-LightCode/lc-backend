@@ -1,6 +1,6 @@
 package com.senior.dreamteam.configs;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.exception.DemoGraphqlException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.senior.dreamteam.services;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.controllers.payload.UserLeaderboardResponse;
 import com.senior.dreamteam.controllers.payload.UserResponse;
 import com.senior.dreamteam.entities.Authorities;
@@ -77,6 +77,11 @@ public class UserService {
                 .build();
 
         return mapUserToUserResponse(userRepository.save(newUser));
+    }
+
+    public void changeUserPassword(User user, String newPassword) {
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     public UserResponse updateUser(String emailFromToken, int id, String authorities, String name, String email) {

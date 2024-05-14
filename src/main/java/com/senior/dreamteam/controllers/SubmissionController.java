@@ -1,6 +1,6 @@
 package com.senior.dreamteam.controllers;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.entities.Submission;
 import com.senior.dreamteam.repositories.SubmissionRepository;
 import com.senior.dreamteam.services.ProblemService;

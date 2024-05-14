@@ -1,4 +1,4 @@
-package com.senior.dreamteam.authentication;
+package com.senior.dreamteam.authentication.services;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

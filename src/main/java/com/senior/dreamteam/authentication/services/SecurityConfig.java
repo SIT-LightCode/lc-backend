@@ -1,5 +1,7 @@
-package com.senior.dreamteam.authentication;
+package com.senior.dreamteam.authentication.services;
 
+import com.senior.dreamteam.authentication.services.JwtFilter;
+import com.senior.dreamteam.authentication.services.JwtEntryPoint;
 import com.senior.dreamteam.entities.Roles;
 import com.senior.dreamteam.services.UserService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.senior.dreamteam.controllers;
 
-import com.senior.dreamteam.authentication.JwtTokenUtil;
+import com.senior.dreamteam.authentication.services.JwtTokenUtil;
 import com.senior.dreamteam.entities.Lesson;
 import com.senior.dreamteam.entities.LessonInput;
 import com.senior.dreamteam.exception.DemoGraphqlException;
@@ -16,7 +16,6 @@ import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.senior.dreamteam.authentication;
+package com.senior.dreamteam.authentication.services;
 
 import com.senior.dreamteam.entities.Authorities;
 import com.senior.dreamteam.entities.Roles;
