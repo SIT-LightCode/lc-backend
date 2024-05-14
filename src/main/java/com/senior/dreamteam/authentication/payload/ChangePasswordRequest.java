@@ -1,6 +1,7 @@
 package com.senior.dreamteam.authentication.payload;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 
 public record ChangePasswordRequest(
@@ -9,7 +10,7 @@ public record ChangePasswordRequest(
         String email,
         @NotEmpty(message = "Password cannot be empty")
         String password,
-        @NotEmpty(message = "New password cannot be empty")
+        @NotEmpty(message = "New password cannot be empty")@Min(value = 6, message = "Password length must more than 6")
         String newPassword
 ) {
 }
