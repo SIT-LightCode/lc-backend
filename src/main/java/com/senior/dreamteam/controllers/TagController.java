@@ -33,7 +33,7 @@ public class TagController {
     }
 
     @SchemaMapping(typeName = "Mutation", value = "upsertTag")
-    public Tag upsertTag(@Validated @Argument TagInput tagInput, @NotEmpty(message = "Token cannot be empty") @ContextValue String token) throws Exception {
+    public Tag upsertTag(@Argument @Validated TagInput tagInput, @NotEmpty(message = "Token cannot be empty") @ContextValue String token) throws Exception {
         if (!jwtTokenUtil.isAdminToken(token)) {
             log.info("Unauthorized: Cannot Update this tag");
             throw new DemoGraphqlException("Unauthorized: Cannot Update this lesson");

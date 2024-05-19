@@ -15,7 +15,7 @@ public class TagInput {
     int id;
 
     @NotEmpty(message = "topic must not be empty")
-    @Min(value = 0, message = "topic length must be greater than or equal to 0") @Max(value = 255, message = "topic length must be lesser than or equal to 255")
+    @Min(value = 0, message = "topic length must be greater than 0") @Max(value = 255, message = "topic length must be more than 255")
     String topic;
     @NotEmpty(message = "description must not be empty")
     String description;
